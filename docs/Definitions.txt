@@ -1,0 +1,28 @@
+1. Concept definitons in the context of JVM
+
+1.1 Thread
+According to vm 8.1.2, creating a Thread object creates a thread, and that is the only way to create a thread.
+When the thread is created, it is not yet active; it begins to run when its start method is called.
+
+1.2 Shared variable
+Shared variable is a variable that can be accessed by more than one thread concurrently.
+Thread-local (or local, when the context is clear) variable is a variable that is not shared.
+The only runtime data area used for the storage of shared variables is heap (vm 3.5.3).
+Considering the kind of variable (as defined in vm 2.5), shared variables can be of the following kinds only:
+        1. class variable
+        2. instance variable
+        3. array element
+
+1.3 Read/write access instructions
+getstatic/putstatic
+        are the only instructions used for read/write access (respectively) to a class variable.
+getfield/putfield
+        are the only instructions used for read/write access (respectively) to an instance variable.
+baload, caload, saload, iaload, laload, faload, daload, aaload
+        are the only instrucltions for read access to an array component.
+bastore, castore, sastore, iastore, lastore, fastore, dastore, aastore
+        are the only instructions for write access to an array component.
+
+
+
+

@@ -1,0 +1,51 @@
+1. Will implement the full version of the algorithm:
+        1.1 Including shared-read, exclusive and read-write
+        1.2 Will instrument relevant classes in java.util.concurrent
+
+2. Technological risks:
+ V  2.1. Use jvmti field watch to trap r/w access to variables.
+ V       Not sure if references are monitored this way (i.e it might be that only primitive fields are).
+ ?       Not sure if array elements are monitored this way.
+
+ V  2.2. For locks_held, use global map L: jthread -> set_of_locks.
+         jthread of the thread performing r/w is accessible via field watch event parameters.
+       - This has been cancelled because jclass/jobject are handles and not pointers, equality & hash functions are feasible,
+         but uneffective.
+       V Use tagging instead.
+       
+
+ V  2.3. For the candidate set, use global map C: jfieldID -> set_of_locks.
+         If jfieldID is insufficient for unique identification, use (jobject,jfieldID) or (jclass,jfieldID) for instance or class fields respectively.   
+         jfieldID, jobject and jclass are accessible via field watch event parameters.
+         Checked, use (jclass,jobject,jfieldID), unless can disambiguate static/non-static, if so use (jobject/jclass,jfieldID).
+       - This has been cancelled because jclass/jobject are handles and not pointers, equality & hash functions are feasible,
+         but uneffective.
+       V Will use tagging to create a list of shared vars data for each object fields.
+   
+    2.4. Use additional field watch event parameters to report accesses verbosely (optional).
+    
+    2.5. To initialize a canditate set for a field, must trap on object creation.
+         In order to do that need to instrument constructors and maybe other means of object creation.
+         In details:
+             V  1. Instrument new.
+                2. Instrument newarray.
+                3. trap on vm object allocation jvmti event.    (optional, not important)
+                4. intercept AllocObject jni function call.    (optional, not important)
+
+       V In the constructor need to go through each field of the object being initialized and create the candidate set for it.
+         The same for each array element of the array being initialized.
+         
+ ?  2.6. Need to trap on object destruction to release resources for candidate set.
+
+    2.7. Need to trap on thread creation (java.lang.Thread). This can be accompished by using thread start jvmti event.
+         Accordingly, use thread end event to release resources gracefully.
+
+    2.8. To update locks_held for each thread, use jvmti events for monitors. Need to discover what events are to be used.
+       - This is problematic, have found no such events, probably will have to instrument by ourselves.
+
+    Summary: pilot for each 2.* to check feasibility. In case jvmti event functionality is insufficient, use instrumentation.
+        Should the instrumentation be found too complex via jvmti, fallback to ASM framework. Consult jvmti examples supplied with jvm for piloting.
+
+3. Misc.
+    3.1. Use boost, isolated/unit testing where appropriate.
+    3.2. Output to stderr.

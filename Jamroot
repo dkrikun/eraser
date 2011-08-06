@@ -1,0 +1,78 @@
+# quick & dirty, for development
+
+project eraser_project ;
+
+import notfile ;
+import common ;
+import os ;
+import testing ;
+
+using gcc ;
+
+
+lib eraser       
+                 : [ glob src/eraser/*.cpp ]
+                   [ glob src/sun/*.c ]
+
+                 : <include>src
+                   <include>src/sun
+                   <include>/usr/lib/jvm/default-java/include
+                   <include>/usr/lib/jvm/default-java/include/linux
+
+                   <link>shared 
+
+                   <cxxflags>-Wno-deprecated
+                   <cxxflags>-Wno-write-strings
+                   <cxxflags>-Wno-sign-compare
+                   <cxxflags>-DERASER_DEBUG
+          ;
+
+install eraser_inst
+                : eraser
+                : <location>bin
+        ;
+
+install tests_inst
+                : universal_set
+                  shared_var
+                  locked
+                : <location>bin
+        ;
+
+exe universal_set
+                : src/test/universal_set.cpp
+                  /home/daniel/work/tools/gmock-1.6.0/lib/.libs/libgmock_main.a
+                  /home/daniel/work/tools/gmock-1.6.0/lib/.libs/libgmock.a
+                  /home/daniel/work/tools/gmock-1.6.0/gtest/lib/.libs/libgtest.a
+
+                : <include>src
+                  <include>/home/daniel/work/tools/gmock-1.6.0/include
+                  <include>/home/daniel/work/tools/gmock-1.6.0/gtest/include
+                  <threading>multi
+          ;
+
+exe shared_var
+                : src/test/shared_var.cpp
+                  src/eraser/shared_var.cpp
+                  /home/daniel/work/tools/gmock-1.6.0/lib/.libs/libgmock_main.a
+                  /home/daniel/work/tools/gmock-1.6.0/lib/.libs/libgmock.a
+                  /home/daniel/work/tools/gmock-1.6.0/gtest/lib/.libs/libgtest.a
+
+                : <include>src
+                  <include>/home/daniel/work/tools/gmock-1.6.0/include
+                  <include>/home/daniel/work/tools/gmock-1.6.0/gtest/include
+                  <threading>multi
+          ;
+
+exe locked
+                : src/test/locked.cpp
+                  src/eraser/shared_var.cpp
+                  /home/daniel/work/tools/gmock-1.6.0/lib/.libs/libgmock_main.a
+                  /home/daniel/work/tools/gmock-1.6.0/lib/.libs/libgmock.a
+                  /home/daniel/work/tools/gmock-1.6.0/gtest/lib/.libs/libgtest.a
+
+                : <include>src
+                  <include>/home/daniel/work/tools/gmock-1.6.0/include
+                  <include>/home/daniel/work/tools/gmock-1.6.0/gtest/include
+                  <threading>multi
+          ;

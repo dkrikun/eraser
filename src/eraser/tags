@@ -1,0 +1,230 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AGENT_H	agent.h	3;"	d
+Agent_OnLoad	main.cpp	/^Agent_OnLoad(JavaVM *vm, char *options, void *reserved)$/;"	f	signature:(JavaVM *vm, char *options, void *reserved)
+Agent_OnUnload	main.cpp	/^Agent_OnUnload(JavaVM *vm) {}$/;"	f	signature:(JavaVM *vm)
+CRW_HOOKS_H	crw_hooks.h	3;"	d
+ENABLE_EVENT_NOTIFICATION	main.cpp	11;"	d	file:
+ENGAGED_FIELD	instrumentation.cpp	164;"	d	file:
+ENGAGED_FIELD	instrumentation.cpp	23;"	d	file:
+ERASER_SET_H	universal_set.h	3;"	d
+EXCLUSIVE	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+INSTRUMENTATION_H	instrumentation.h	2;"	d
+LOCK_AND_EXIT_ON_DEATH	main.cpp	15;"	d	file:
+METHOD_ENTRY	instrumentation.cpp	167;"	d	file:
+METHOD_ENTRY	instrumentation.cpp	24;"	d	file:
+METHOD_EXIT	instrumentation.cpp	168;"	d	file:
+METHOD_EXIT	instrumentation.cpp	25;"	d	file:
+MONITOR_H	monitor.h	3;"	d
+NATIVE_METHOD_ENTRY	instrumentation.cpp	171;"	d	file:
+NATIVE_METHOD_ENTRY	instrumentation.cpp	30;"	d	file:
+NATIVE_METHOD_EXIT	instrumentation.cpp	172;"	d	file:
+NATIVE_METHOD_EXIT	instrumentation.cpp	31;"	d	file:
+NATIVE_NEW_ARR_METHOD	instrumentation.cpp	29;"	d	file:
+NATIVE_NEW_OBJ_METHOD	instrumentation.cpp	169;"	d	file:
+NATIVE_NEW_OBJ_METHOD	instrumentation.cpp	170;"	d	file:
+NATIVE_NEW_OBJ_METHOD	instrumentation.cpp	28;"	d	file:
+NEW_ARR_METHOD	instrumentation.cpp	166;"	d	file:
+NEW_ARR_METHOD	instrumentation.cpp	27;"	d	file:
+NEW_OBJ_METHOD	instrumentation.cpp	165;"	d	file:
+NEW_OBJ_METHOD	instrumentation.cpp	26;"	d	file:
+PROXY_CLASS	instrumentation.cpp	163;"	d	file:
+PROXY_CLASS	instrumentation.cpp	22;"	d	file:
+SHARED_READ	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+SHARED_VAR_H	shared_var.h	3;"	d
+SHARED_WRITE	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+THREAD_H	thread.h	3;"	d
+TYPES_H	types.h	3;"	d
+VIRGIN	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+VM_HOOKS	vm_hooks.h	3;"	d
+add_new_shared_var	agent.h	/^        void add_new_shared_var( jclass field_class, jobject field_object, jfieldID field_id )$/;"	f	struct:eraser::agent	access:public	signature:( jclass field_class, jobject field_object, jfieldID field_id )
+agent	agent.h	/^        agent()$/;"	f	struct:eraser::agent	access:private	signature:()
+agent	agent.h	/^struct agent : boost::noncopyable$/;"	s	namespace:eraser	inherits:boost::noncopyable
+container_t	universal_set.h	/^        typedef typename std::set<T> container_t;$/;"	t	struct:eraser::universal_set	access:private
+cv_	shared_var.h	/^                shared_var_set< lock_t >        cv_;$/;"	m	struct:eraser::shared_var	access:public
+death_active_	agent.h	/^        bool                     death_active_;$/;"	m	struct:eraser::agent	access:public
+disengage	instrumentation.cpp	/^        void disengage( jvmtiEnv* jvmti, JNIEnv* jni )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+disengage	instrumentation.h	/^void disengage( jvmtiEnv* jvmti, JNIEnv* jni );$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+empty	universal_set.h	/^        bool empty() const$/;"	f	struct:eraser::universal_set	access:public	signature:() const
+engage	instrumentation.cpp	/^        void engage( jvmtiEnv* jvmti, JNIEnv* jni )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+engage	instrumentation.h	/^void engage( jvmtiEnv* jvmti, JNIEnv* jni );$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+erase	universal_set.h	/^                void erase( const T& );$/;"	p	struct:eraser::shared_var_set	access:private	signature:( const T& )
+erase	universal_set.h	/^        void erase( const T& x )$/;"	f	struct:eraser::universal_set	access:public	signature:( const T& x )
+eraser	agent.h	/^namespace eraser$/;"	n
+eraser	crw_hooks.cpp	/^namespace eraser$/;"	n	file:
+eraser	crw_hooks.h	/^namespace eraser$/;"	n
+eraser	instrumentation.cpp	/^namespace eraser$/;"	n	file:
+eraser	instrumentation.h	/^namespace eraser$/;"	n
+eraser	monitor.h	/^namespace eraser$/;"	n
+eraser	shared_var.h	/^namespace eraser$/;"	n
+eraser	thread.h	/^namespace eraser$/;"	n
+eraser	types.h	/^namespace eraser$/;"	n
+eraser	universal_set.h	/^namespace eraser$/;"	n
+eraser	vm_hooks.cpp	/^namespace eraser$/;"	n	file:
+eraser	vm_hooks.h	/^namespace eraser$/;"	n
+eraser::agent	agent.h	/^struct agent : boost::noncopyable$/;"	s	namespace:eraser	inherits:boost::noncopyable
+eraser::agent::add_new_shared_var	agent.h	/^        void add_new_shared_var( jclass field_class, jobject field_object, jfieldID field_id )$/;"	f	struct:eraser::agent	access:public	signature:( jclass field_class, jobject field_object, jfieldID field_id )
+eraser::agent::agent	agent.h	/^        agent()$/;"	f	struct:eraser::agent	access:private	signature:()
+eraser::agent::death_active_	agent.h	/^        bool                     death_active_;$/;"	m	struct:eraser::agent	access:public
+eraser::agent::exclude_	agent.h	/^        const char*              exclude_;$/;"	m	struct:eraser::agent	access:public
+eraser::agent::include_	agent.h	/^        const char*              include_;$/;"	m	struct:eraser::agent	access:public
+eraser::agent::instance	agent.h	/^        static agent* instance()$/;"	f	struct:eraser::agent	access:public	signature:()
+eraser::agent::jni_	agent.h	/^        JNIEnv*                  jni_;$/;"	m	struct:eraser::agent	access:public
+eraser::agent::jvmti_	agent.h	/^        jvmtiEnv*                jvmti_;$/;"	m	struct:eraser::agent	access:public
+eraser::agent::monitor_	agent.h	/^        jrawMonitorID            monitor_;$/;"	m	struct:eraser::agent	access:public
+eraser::agent::phase	agent.h	/^        jvmtiPhase phase() const$/;"	f	struct:eraser::agent	access:public	signature:() const
+eraser::agent::shared_var_table_t	agent.h	/^        typedef boost::unordered_map< fields_key_t, shared_var_t >       shared_var_table_t;$/;"	t	struct:eraser::agent	access:public
+eraser::agent::shared_vars_	agent.h	/^        shared_var_table_t       shared_vars_;$/;"	m	struct:eraser::agent	access:public
+eraser::agent::thread_table_t	agent.h	/^        typedef boost::unordered_map< jthread, thread_t >                thread_table_t;$/;"	t	struct:eraser::agent	access:public
+eraser::agent::threads_	agent.h	/^        thread_table_t           threads_;$/;"	m	struct:eraser::agent	access:public
+eraser::disengage	instrumentation.cpp	/^        void disengage( jvmtiEnv* jvmti, JNIEnv* jni )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+eraser::disengage	instrumentation.h	/^void disengage( jvmtiEnv* jvmti, JNIEnv* jni );$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+eraser::engage	instrumentation.cpp	/^        void engage( jvmtiEnv* jvmti, JNIEnv* jni )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+eraser::engage	instrumentation.h	/^void engage( jvmtiEnv* jvmti, JNIEnv* jni );$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni )
+eraser::field_read	vm_hooks.cpp	/^void field_read( jvmtiEnv* jvmti, JNIEnv* jni$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field )
+eraser::field_read	vm_hooks.h	/^void field_read( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field )
+eraser::field_write	vm_hooks.cpp	/^void field_write( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	file:	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field , char signature_type, jvalue new_value )
+eraser::field_write	vm_hooks.h	/^void field_write( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field , char signature_type, jvalue new_value )
+eraser::fields_key_t	types.h	/^typedef fusion::vector< jclass, jobject, jfieldID > fields_key_t;$/;"	t	namespace:eraser
+eraser::get_classname	instrumentation.cpp	/^        inline const char* get_classname( const char* name, const unsigned char* class_data, jint class_data_len )$/;"	f	namespace:eraser	signature:( const char* name, const unsigned char* class_data, jint class_data_len )
+eraser::instrument_classfile	instrumentation.cpp	/^        void instrument_classfile( jvmtiEnv* jvmti, JNIEnv* jni$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jclass class_being_redefined, jobject loader , const char* name, jobject protection_domain , jint class_data_len, const unsigned char* class_data , jint* new_class_data_len, unsigned char** new_class_data )
+eraser::instrument_classfile	instrumentation.h	/^void instrument_classfile( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jclass class_being_redefined, jobject loader , const char* name, jobject protection_domain , jint class_data_len, const unsigned char* class_data , jint* new_class_data_len, unsigned char** new_class_data )
+eraser::make_empty_set	universal_set.h	/^inline universal_set<T> make_empty_set()$/;"	f	namespace:eraser	signature:()
+eraser::make_universal_set	universal_set.h	/^inline universal_set<T> make_universal_set()$/;"	f	namespace:eraser	signature:()
+eraser::mnr	instrumentation.cpp	/^void mnr(unsigned i, const char** s, const char** s2, int i2)$/;"	f	namespace:eraser	signature:(unsigned i, const char** s, const char** s2, int i2)
+eraser::monitor_enter	monitor.h	/^inline void monitor_enter( jvmtiEnv* jvmti, jrawMonitorID monitor )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, jrawMonitorID monitor )
+eraser::monitor_exit	monitor.h	/^inline void monitor_exit( jvmtiEnv* jvmti, jrawMonitorID monitor )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, jrawMonitorID monitor )
+eraser::native_method_entry	crw_hooks.cpp	/^void native_method_entry(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)$/;"	f	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+eraser::native_method_entry	crw_hooks.h	/^void native_method_entry(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+eraser::native_method_exit	crw_hooks.cpp	/^void native_method_exit(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)$/;"	f	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+eraser::native_method_exit	crw_hooks.h	/^void native_method_exit(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+eraser::native_new_method_t	crw_hooks.h	/^typedef void (*native_new_method_t)(JNIEnv *, jclass, jthread, jobject);$/;"	t	namespace:eraser
+eraser::native_newarr	crw_hooks.cpp	/^void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)$/;"	f	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
+eraser::native_newarr	crw_hooks.h	/^void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject o);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, jobject o)
+eraser::native_newobj	crw_hooks.cpp	/^void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread, jobject obj )$/;"	f	namespace:eraser	signature:( JNIEnv *jni, jclass tracker_class, jthread thread, jobject obj )
+eraser::native_newobj	crw_hooks.h	/^void native_newobj(JNIEnv *jni, jclass klass, jthread thread, jobject o);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, jobject o)
+eraser::scoped_lock	monitor.h	/^struct scoped_lock$/;"	s	namespace:eraser
+eraser::scoped_lock::jvmti_	monitor.h	/^        jvmtiEnv*       jvmti_;$/;"	m	struct:eraser::scoped_lock	access:public
+eraser::scoped_lock::monitor_	monitor.h	/^        jrawMonitorID   monitor_;$/;"	m	struct:eraser::scoped_lock	access:public
+eraser::scoped_lock::scoped_lock	monitor.h	/^        scoped_lock( jvmtiEnv* jvmti, jrawMonitorID monitor )$/;"	f	struct:eraser::scoped_lock	access:public	signature:( jvmtiEnv* jvmti, jrawMonitorID monitor )
+eraser::scoped_lock::~scoped_lock	monitor.h	/^        ~scoped_lock()$/;"	f	struct:eraser::scoped_lock	access:public	signature:()
+eraser::shared_var	shared_var.h	/^        struct shared_var$/;"	s	namespace:eraser
+eraser::shared_var::EXCLUSIVE	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+eraser::shared_var::SHARED_READ	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+eraser::shared_var::SHARED_WRITE	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+eraser::shared_var::VIRGIN	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	e	enum:eraser::shared_var::__anon1
+eraser::shared_var::cv_	shared_var.h	/^                shared_var_set< lock_t >        cv_;$/;"	m	struct:eraser::shared_var	access:public
+eraser::shared_var::exclusive	shared_var.h	/^                void exclusive( const thread_t& owner )$/;"	f	struct:eraser::shared_var	access:public	signature:( const thread_t& owner )
+eraser::shared_var::exclusive_owner_	shared_var.h	/^                boost::optional< thread_t >     exclusive_owner_;$/;"	m	struct:eraser::shared_var	access:public
+eraser::shared_var::field_id_	shared_var.h	/^                jfieldID                        field_id_;$/;"	m	struct:eraser::shared_var	access:public
+eraser::shared_var::shared_read	shared_var.h	/^                void shared_read()$/;"	f	struct:eraser::shared_var	access:public	signature:()
+eraser::shared_var::shared_var	shared_var.h	/^                shared_var( jfieldID field_id )$/;"	f	struct:eraser::shared_var	access:public	signature:( jfieldID field_id )
+eraser::shared_var::shared_write	shared_var.h	/^                void shared_write()$/;"	f	struct:eraser::shared_var	access:public	signature:()
+eraser::shared_var::state_	shared_var.h	/^                state_t                         state_;$/;"	m	struct:eraser::shared_var	access:public
+eraser::shared_var::state_t	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	m	struct:eraser::shared_var	typeref:enum:eraser::shared_var::__anon1	access:public
+eraser::shared_var_set	universal_set.h	/^struct shared_var_set : public universal_set<T>$/;"	s	namespace:eraser	inherits:universal_set
+eraser::shared_var_set::erase	universal_set.h	/^                void erase( const T& );$/;"	p	struct:eraser::shared_var_set	access:private	signature:( const T& )
+eraser::shared_var_set::insert	universal_set.h	/^                void insert( const T& );$/;"	p	struct:eraser::shared_var_set	access:private	signature:( const T& )
+eraser::shared_var_set::shared_var_set	universal_set.h	/^        shared_var_set() : universal_set<T>(false){}$/;"	f	struct:eraser::shared_var_set	access:public	signature:()
+eraser::thread	thread.h	/^        struct thread$/;"	s	namespace:eraser
+eraser::thread::locks_held_	thread.h	/^                thread_set< lock_t >    locks_held_;$/;"	m	struct:eraser::thread	access:public
+eraser::thread_end	vm_hooks.cpp	/^void thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )$/;"	f	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+eraser::thread_end	vm_hooks.h	/^void thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );$/;"	p	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+eraser::thread_set	universal_set.h	/^struct thread_set : public universal_set<T>$/;"	s	namespace:eraser	inherits:universal_set
+eraser::thread_set::intersect_with	universal_set.h	/^                void intersect_with( const universal_set<T>& );$/;"	p	struct:eraser::thread_set	access:private	signature:( const universal_set<T>& )
+eraser::thread_set::thread_set	universal_set.h	/^        thread_set() : universal_set<T>(true){}$/;"	f	struct:eraser::thread_set	access:public	signature:()
+eraser::thread_start	vm_hooks.cpp	/^void thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )$/;"	f	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+eraser::thread_start	vm_hooks.h	/^void thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );$/;"	p	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+eraser::universal_set	universal_set.h	/^struct universal_set$/;"	s	namespace:eraser
+eraser::universal_set::container_t	universal_set.h	/^        typedef typename std::set<T> container_t;$/;"	t	struct:eraser::universal_set	access:private
+eraser::universal_set::empty	universal_set.h	/^        bool empty() const$/;"	f	struct:eraser::universal_set	access:public	signature:() const
+eraser::universal_set::erase	universal_set.h	/^        void erase( const T& x )$/;"	f	struct:eraser::universal_set	access:public	signature:( const T& x )
+eraser::universal_set::in_place_intersect	universal_set.h	/^        void in_place_intersect( container_t& lhs, const container_t& rhs )$/;"	f	struct:eraser::universal_set	access:private	signature:( container_t& lhs, const container_t& rhs )
+eraser::universal_set::insert	universal_set.h	/^        void insert( const T& x )$/;"	f	struct:eraser::universal_set	access:public	signature:( const T& x )
+eraser::universal_set::intersect_with	universal_set.h	/^        void intersect_with( const universal_set& rhs )$/;"	f	struct:eraser::universal_set	access:public	signature:( const universal_set& rhs )
+eraser::universal_set::iterator_t	universal_set.h	/^        typedef typename container_t::iterator iterator_t;$/;"	t	struct:eraser::universal_set	access:private
+eraser::universal_set::operator ==	universal_set.h	/^        bool operator==( const universal_set& rhs ) const$/;"	f	struct:eraser::universal_set	access:public	signature:( const universal_set& rhs ) const
+eraser::universal_set::storage_	universal_set.h	/^        boost::optional< container_t > storage_;$/;"	m	struct:eraser::universal_set	access:private
+eraser::universal_set::universal	universal_set.h	/^        bool universal() const$/;"	f	struct:eraser::universal_set	access:public	signature:() const
+eraser::universal_set::universal_set	universal_set.h	/^        universal_set( bool is_universal )$/;"	f	struct:eraser::universal_set	access:protected	signature:( bool is_universal )
+exclude_	agent.h	/^        const char*              exclude_;$/;"	m	struct:eraser::agent	access:public
+exclusive	shared_var.h	/^                void exclusive( const thread_t& owner )$/;"	f	struct:eraser::shared_var	access:public	signature:( const thread_t& owner )
+exclusive_owner_	shared_var.h	/^                boost::optional< thread_t >     exclusive_owner_;$/;"	m	struct:eraser::shared_var	access:public
+field_id_	shared_var.h	/^                jfieldID                        field_id_;$/;"	m	struct:eraser::shared_var	access:public
+field_read	vm_hooks.cpp	/^void field_read( jvmtiEnv* jvmti, JNIEnv* jni$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field )
+field_read	vm_hooks.h	/^void field_read( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field )
+field_write	vm_hooks.cpp	/^void field_write( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	file:	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field , char signature_type, jvalue new_value )
+field_write	vm_hooks.h	/^void field_write( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field , char signature_type, jvalue new_value )
+fields_key_t	types.h	/^typedef fusion::vector< jclass, jobject, jfieldID > fields_key_t;$/;"	t	namespace:eraser
+get_classname	instrumentation.cpp	/^        inline const char* get_classname( const char* name, const unsigned char* class_data, jint class_data_len )$/;"	f	namespace:eraser	signature:( const char* name, const unsigned char* class_data, jint class_data_len )
+in_place_intersect	universal_set.h	/^        void in_place_intersect( container_t& lhs, const container_t& rhs )$/;"	f	struct:eraser::universal_set	access:private	signature:( container_t& lhs, const container_t& rhs )
+include_	agent.h	/^        const char*              include_;$/;"	m	struct:eraser::agent	access:public
+insert	universal_set.h	/^                void insert( const T& );$/;"	p	struct:eraser::shared_var_set	access:private	signature:( const T& )
+insert	universal_set.h	/^        void insert( const T& x )$/;"	f	struct:eraser::universal_set	access:public	signature:( const T& x )
+instance	agent.h	/^        static agent* instance()$/;"	f	struct:eraser::agent	access:public	signature:()
+instrument_classfile	instrumentation.cpp	/^        void instrument_classfile( jvmtiEnv* jvmti, JNIEnv* jni$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jclass class_being_redefined, jobject loader , const char* name, jobject protection_domain , jint class_data_len, const unsigned char* class_data , jint* new_class_data_len, unsigned char** new_class_data )
+instrument_classfile	instrumentation.h	/^void instrument_classfile( jvmtiEnv* jvmti, JNIEnv* jni$/;"	p	namespace:eraser	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jclass class_being_redefined, jobject loader , const char* name, jobject protection_domain , jint class_data_len, const unsigned char* class_data , jint* new_class_data_len, unsigned char** new_class_data )
+intersect_with	universal_set.h	/^                void intersect_with( const universal_set<T>& );$/;"	p	struct:eraser::thread_set	access:private	signature:( const universal_set<T>& )
+intersect_with	universal_set.h	/^        void intersect_with( const universal_set& rhs )$/;"	f	struct:eraser::universal_set	access:public	signature:( const universal_set& rhs )
+iterator_t	universal_set.h	/^        typedef typename container_t::iterator iterator_t;$/;"	t	struct:eraser::universal_set	access:private
+jni_	agent.h	/^        JNIEnv*                  jni_;$/;"	m	struct:eraser::agent	access:public
+jvmti_	agent.h	/^        jvmtiEnv*                jvmti_;$/;"	m	struct:eraser::agent	access:public
+jvmti_	monitor.h	/^        jvmtiEnv*       jvmti_;$/;"	m	struct:eraser::scoped_lock	access:public
+locks_held_	thread.h	/^                thread_set< lock_t >    locks_held_;$/;"	m	struct:eraser::thread	access:public
+make_empty_set	universal_set.h	/^inline universal_set<T> make_empty_set()$/;"	f	namespace:eraser	signature:()
+make_universal_set	universal_set.h	/^inline universal_set<T> make_universal_set()$/;"	f	namespace:eraser	signature:()
+mnr	instrumentation.cpp	/^void mnr(unsigned i, const char** s, const char** s2, int i2)$/;"	f	namespace:eraser	signature:(unsigned i, const char** s, const char** s2, int i2)
+monitor_	agent.h	/^        jrawMonitorID            monitor_;$/;"	m	struct:eraser::agent	access:public
+monitor_	monitor.h	/^        jrawMonitorID   monitor_;$/;"	m	struct:eraser::scoped_lock	access:public
+monitor_enter	monitor.h	/^inline void monitor_enter( jvmtiEnv* jvmti, jrawMonitorID monitor )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, jrawMonitorID monitor )
+monitor_exit	monitor.h	/^inline void monitor_exit( jvmtiEnv* jvmti, jrawMonitorID monitor )$/;"	f	namespace:eraser	signature:( jvmtiEnv* jvmti, jrawMonitorID monitor )
+native_method_entry	crw_hooks.cpp	/^void native_method_entry(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)$/;"	f	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+native_method_entry	crw_hooks.h	/^void native_method_entry(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+native_method_exit	crw_hooks.cpp	/^void native_method_exit(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)$/;"	f	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+native_method_exit	crw_hooks.h	/^void native_method_exit(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+native_new_method_t	crw_hooks.h	/^typedef void (*native_new_method_t)(JNIEnv *, jclass, jthread, jobject);$/;"	t	namespace:eraser
+native_newarr	crw_hooks.cpp	/^void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)$/;"	f	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
+native_newarr	crw_hooks.h	/^void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject o);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, jobject o)
+native_newobj	crw_hooks.cpp	/^void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread, jobject obj )$/;"	f	namespace:eraser	signature:( JNIEnv *jni, jclass tracker_class, jthread thread, jobject obj )
+native_newobj	crw_hooks.h	/^void native_newobj(JNIEnv *jni, jclass klass, jthread thread, jobject o);$/;"	p	namespace:eraser	signature:(JNIEnv *jni, jclass klass, jthread thread, jobject o)
+operator ==	universal_set.h	/^        bool operator==( const universal_set& rhs ) const$/;"	f	struct:eraser::universal_set	access:public	signature:( const universal_set& rhs ) const
+phase	agent.h	/^        jvmtiPhase phase() const$/;"	f	struct:eraser::agent	access:public	signature:() const
+scoped_lock	monitor.h	/^        scoped_lock( jvmtiEnv* jvmti, jrawMonitorID monitor )$/;"	f	struct:eraser::scoped_lock	access:public	signature:( jvmtiEnv* jvmti, jrawMonitorID monitor )
+scoped_lock	monitor.h	/^struct scoped_lock$/;"	s	namespace:eraser
+shared_read	shared_var.h	/^                void shared_read()$/;"	f	struct:eraser::shared_var	access:public	signature:()
+shared_var	shared_var.h	/^                shared_var( jfieldID field_id )$/;"	f	struct:eraser::shared_var	access:public	signature:( jfieldID field_id )
+shared_var	shared_var.h	/^        struct shared_var$/;"	s	namespace:eraser
+shared_var_set	universal_set.h	/^        shared_var_set() : universal_set<T>(false){}$/;"	f	struct:eraser::shared_var_set	access:public	signature:()
+shared_var_set	universal_set.h	/^struct shared_var_set : public universal_set<T>$/;"	s	namespace:eraser	inherits:universal_set
+shared_var_table_t	agent.h	/^        typedef boost::unordered_map< fields_key_t, shared_var_t >       shared_var_table_t;$/;"	t	struct:eraser::agent	access:public
+shared_vars_	agent.h	/^        shared_var_table_t       shared_vars_;$/;"	m	struct:eraser::agent	access:public
+shared_write	shared_var.h	/^                void shared_write()$/;"	f	struct:eraser::shared_var	access:public	signature:()
+state_	shared_var.h	/^                state_t                         state_;$/;"	m	struct:eraser::shared_var	access:public
+state_t	shared_var.h	/^                enum { VIRGIN, EXCLUSIVE, SHARED_READ, SHARED_WRITE } state_t;$/;"	m	struct:eraser::shared_var	typeref:enum:eraser::shared_var::__anon1	access:public
+storage_	universal_set.h	/^        boost::optional< container_t > storage_;$/;"	m	struct:eraser::universal_set	access:private
+thread	thread.h	/^        struct thread$/;"	s	namespace:eraser
+thread_end	vm_hooks.cpp	/^void thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )$/;"	f	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+thread_end	vm_hooks.h	/^void thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );$/;"	p	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+thread_set	universal_set.h	/^        thread_set() : universal_set<T>(true){}$/;"	f	struct:eraser::thread_set	access:public	signature:()
+thread_set	universal_set.h	/^struct thread_set : public universal_set<T>$/;"	s	namespace:eraser	inherits:universal_set
+thread_start	vm_hooks.cpp	/^void thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )$/;"	f	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+thread_start	vm_hooks.h	/^void thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );$/;"	p	namespace:eraser	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+thread_table_t	agent.h	/^        typedef boost::unordered_map< jthread, thread_t >                thread_table_t;$/;"	t	struct:eraser::agent	access:public
+threads_	agent.h	/^        thread_table_t           threads_;$/;"	m	struct:eraser::agent	access:public
+universal	universal_set.h	/^        bool universal() const$/;"	f	struct:eraser::universal_set	access:public	signature:() const
+universal_set	universal_set.h	/^        universal_set( bool is_universal )$/;"	f	struct:eraser::universal_set	access:protected	signature:( bool is_universal )
+universal_set	universal_set.h	/^struct universal_set$/;"	s	namespace:eraser
+vm_classfile_load	main.cpp	/^void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni$/;"	f	signature:( jvmtiEnv *jvmti, JNIEnv* jni , jclass class_being_redefined, jobject loader , const char* name, jobject protection_domain , jint class_data_len, const unsigned char* class_data , jint* new_class_data_len, unsigned char** new_class_data )
+vm_death	main.cpp	/^void JNICALL vm_death( jvmtiEnv *jvmti, JNIEnv *jni )$/;"	f	signature:( jvmtiEnv *jvmti, JNIEnv *jni )
+vm_field_read	main.cpp	/^void JNICALL vm_field_read( jvmtiEnv* jvmti, JNIEnv* jni$/;"	f	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field )
+vm_field_write	main.cpp	/^void JNICALL vm_field_write( jvmtiEnv* jvmti, JNIEnv* jni$/;"	f	signature:( jvmtiEnv* jvmti, JNIEnv* jni , jthread thread, jmethodID method , jlocation location, jclass field_klass , jobject object, jfieldID field , char signature_type, jvalue new_value )
+vm_init	main.cpp	/^void JNICALL vm_init( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )$/;"	f	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+vm_object_alloc	main.cpp	/^void JNICALL vm_object_alloc( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread$/;"	f	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread , jobject o, jclass object_klass, jlong size )
+vm_start	main.cpp	/^void JNICALL  vm_start( jvmtiEnv *jvmti, JNIEnv *jni )$/;"	f	signature:( jvmtiEnv *jvmti, JNIEnv *jni )
+vm_thread_end	main.cpp	/^void JNICALL vm_thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )$/;"	f	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+vm_thread_start	main.cpp	/^void JNICALL vm_thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )$/;"	f	signature:( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
+~scoped_lock	monitor.h	/^        ~scoped_lock()$/;"	f	struct:eraser::scoped_lock	access:public	signature:()

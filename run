@@ -1,0 +1,10 @@
+#! /bin/bash
+
+$BOOST_ROOT/bjam eraser_inst
+javac src/eraser/Proxy.java -d bin
+classpath=$eraser/inputs/trivial
+class=Inc
+args="1 10 true"
+rm -f out
+java -Dcom.sun.management.jmxremote -agentpath:./bin/liberaser.so -Xbootclasspath/a:./bin -cp $classpath $class $args >& out
+#jdb  -J-agentpath:./bin/agent.so -J-Xbootclasspath/a:./bin -classpath $classpath $class $args
