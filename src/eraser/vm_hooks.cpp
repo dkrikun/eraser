@@ -34,8 +34,12 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 		memset( &ti, 0, sizeof(ti) );
 		err = agent::instance()->jvmti()->GetThreadInfo( thread_id, &ti );
 		check_jvmti_error( agent::instance()->jvmti(), err, "get thread info" );
-		if( strcmp( ti.name, "DestroyJavaVM") == 0 )
+		if( strcmp( ti.name, "DestroyJavaVM") == 0 || agent::instance()->met_destroy_jvm_thread_ )
+		{
+			agent::instance()->met_destroy_jvm_thread_ = true;
 			return;
+		}
+
 
 
 		jthread global_ref = agent::instance()->jni()->NewWeakGlobalRef( thread_id );

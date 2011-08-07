@@ -28,6 +28,7 @@ struct agent : boost::noncopyable
         jrawMonitorID            monitor_;
         bool                     death_active_;
         std::ostream&			 logger_;
+        bool					 met_destroy_jvm_thread_;
 
         jvmtiPhase phase() const
         {
@@ -120,6 +121,7 @@ struct agent : boost::noncopyable
                 : jvmti_(0)
 				, jni_(0)
         		, logger_( std::cerr )
+        		, met_destroy_jvm_thread_( false )
         {}
 };
 
