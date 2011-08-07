@@ -21,10 +21,24 @@ const thread_t& get_thread( jthread thread_id )
 void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
                 , jthread thread_id )
 {
+		jvmtiError err;
 		ERASER_LOG( "thread_id=" << thread_id );
+#		if defined( ERASER_DEBUG )
 		agent::instance()->all_threads_dump();
-		// sigsegv here, might be too many references?
-		jthread global_ref = agent::instance()->jni()->NewGlobalRef( thread_id );
+		agent::instance()->dump_thread_debug( thread_id );
+		ERASER_LOG( "thread_count=" << agent::instance()->all_threads().size() );
+#		endif
+
+		// debug, quick and dirty workaround for unclear sigsegv
+		jvmtiThreadInfo ti;
+		memset( &ti, 0, sizeof(ti) );
+		err = agent::instance()->jvmti()->GetThreadInfo( thread_id, &ti );
+		check_jvmti_error( agent::instance()->jvmti(), err, "get thread info" );
+		if( strcmp( ti.name, "DestroyJavaVM") == 0 )
+			return;
+
+
+		jthread global_ref = agent::instance()->jni()->NewWeakGlobalRef( thread_id );
 		ERASER_LOG( "global_ref=" << global_ref );
 		if( global_ref == 0 )
 			fatal_error("Out of memory while trying to create new global ref.");
@@ -36,10 +50,11 @@ void thread_end( jvmtiEnv *jvmti, JNIEnv *jni
 {
 		ERASER_LOG( "thread_id=" << thread_id );
 		thread_t* od = get_tag<thread_t>( thread_id );
-		BOOST_ASSERT( od != 0 );
+		if( od == 0 )
+			return;
 		clear_tag( thread_id );
 		ERASER_LOG( "global_ref=" << od->thread_id_ );
-		agent::instance()->jni()->DeleteGlobalRef( od->thread_id_ );
+		//agent::instance()->jni()->DeleteGlobalRef( od->thread_id_ );
 		delete od;
 }
 

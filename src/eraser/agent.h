@@ -6,6 +6,9 @@
 #include <boost/utility.hpp>
 #include <boost/assert.hpp>
 
+// debug
+#include <vector>
+
 #include "sun/agent_util.h"
 #include "eraser/traits.h"
 
@@ -35,9 +38,10 @@ struct agent : boost::noncopyable
                 return res;
         }
 
+#		if defined( ERASER_DEBUG )
         void all_threads_dump() const
         {
-#				if defined( ERASER_DEBUG )
+
         		jvmtiError err;
         		jint threads_count = 0;
         		jthread* threads;
@@ -47,8 +51,41 @@ struct agent : boost::noncopyable
         		for( size_t j=0; j<threads_count; ++j )
         			std::cerr << threads[j] << " ";
         		std::cerr << std::endl;
-#				endif
+
         }
+
+        std::vector<jthread> all_threads() const
+		{
+        	jvmtiError err;
+        	jint threads_count = 0;
+        	jthread* threads;
+        	err = jvmti()->GetAllThreads( &threads_count, &threads );
+        	check_jvmti_error( jvmti(), err, "get all threads" );
+        	BOOST_ASSERT( threads != 0 );
+        	return std::vector<jthread>(threads,threads+threads_count);
+		}
+
+        void dump_thread_debug( jthread thread )
+        {
+        	jvmtiError err;
+        	jint thread_state;
+        	err = jvmti()->GetThreadState( thread, &thread_state );
+        	check_jvmti_error( jvmti(), err, "get thread state" );
+        	ERASER_LOG( "thread state= " << thread_state );
+        	jvmtiThreadInfo ti;
+        	memset( &ti, 0, sizeof(ti) );
+        	err = jvmti()->GetThreadInfo( thread, &ti );
+        	check_jvmti_error( jvmti(), err, "get thread info" );
+        	ERASER_LOG( "thread name= " << ti.name
+        			<< " priority= " << ti.priority
+        			<< " is_daemon= " << (int)ti.is_daemon
+        			<< " thread_group= " << ti.thread_group
+        			<< " cls_loader= " << ti.context_class_loader );
+
+        }
+#		endif
+
+
 
         static agent* instance()
         {

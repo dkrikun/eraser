@@ -57,7 +57,7 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
                               , jint* new_class_data_len, unsigned char** new_class_data )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        ERASER_LOG( eraser::agent::instance()->phase() );
+        //ERASER_LOG( eraser::agent::instance()->phase() );
         eraser::instrument_classfile( jvmti, jni, class_being_redefined, loader, name, protection_domain
                                 , class_data_len, class_data, new_class_data_len, new_class_data );
 }
@@ -65,14 +65,14 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
 void JNICALL vm_thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        ERASER_LOG( eraser::agent::instance()->phase() );
+        ERASER_LOG( "phase=" << eraser::agent::instance()->phase() );
         eraser::thread_start( jvmti, jni, thread );
 }
 
 void JNICALL vm_thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        ERASER_LOG( eraser::agent::instance()->phase() );
+        ERASER_LOG( "phase=" << eraser::agent::instance()->phase() );
         eraser::thread_end( jvmti, jni, thread );
 }
 
@@ -121,12 +121,18 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         jint rc;
         jvmtiError err;
         
+
         // init jvmti env
         jvmtiEnv* jvmti = 0;
         rc = vm->GetEnv( (void **)&jvmti, JVMTI_VERSION);
         if (rc != JNI_OK || jvmti == 0)
             fatal_error("ERROR: Unable to create jvmtiEnv, error=%d\n", rc);
         
+        jint version = 0;
+        jvmti->GetVersionNumber( &version );
+        ERASER_LOG( "jvmti version= " << version );
+
+
         eraser::agent::instance()->jvmti_ = jvmti;
           
         // init agent lock
