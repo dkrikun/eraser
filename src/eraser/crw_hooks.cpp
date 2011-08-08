@@ -59,21 +59,18 @@ void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 {
 }
 
-void native_method_entry(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+void native_method_entry(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 {
-	std::cerr << "^^^^^^ MONITOR ENTER ^^^^^^^" << std::endl;
-  //    std::cerr << thread << ' '
-  //            << cnum << ' '
-  //            << mnum << ' '
-  //            << std::endl;
+		ERASER_LOG( "MONITOR ENTER"
+				<< " thread= " << thread
+				<< " monitor= " << obj );
+
 }
-void native_method_exit(JNIEnv *jni, jclass klass, jthread thread, int cnum, int mnum)
+void native_method_exit(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 {
-	std::cerr << "^^^^^^ MONITOR EXIT ^^^^^^^" << std::endl;
-  //    std::cerr << thread << ' '
-  //            << cnum << ' '
-  //            << mnum << ' '
-  //            << std::endl;
+		ERASER_LOG( "MONITOR EXIT"
+			<< " thread= " << thread
+			<< " monitor= " << obj );
 }
 
 }

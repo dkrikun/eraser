@@ -2,7 +2,7 @@
 
 $BOOST_ROOT/bjam eraser_inst
 javac src/eraser/Proxy.java -d bin
-classpath=$eraser/inputs/inc
+classpath=$eraser/inputs/tsync
 class=Inc
 args="1 4 true"
 rm -f out

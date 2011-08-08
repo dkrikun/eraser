@@ -796,11 +796,11 @@ injection_template(MethodImage *mi, ByteCode *bytecodes, ByteOffset max_nbytes,
         push_cnum       = JNI_FALSE;
         push_mnum       = JNI_FALSE;
     } else {
-        max_stack       = mi->max_stack + 2;
-        add_dup         = JNI_FALSE;
+        max_stack       = mi->max_stack + 1;
+        add_dup         = JNI_TRUE;
         add_aload       = JNI_FALSE;
-        push_cnum       = JNI_TRUE;
-        push_mnum       = JNI_TRUE;
+        push_cnum       = JNI_FALSE;
+        push_mnum       = JNI_FALSE;
     }
 
     if ( add_dup ) {
@@ -2384,13 +2384,13 @@ java_crw_demo(unsigned class_number,
         CRW_FATAL(&ci, "tclass_sig is not a valid class signature");
     }
     if ( call_name != NULL ) {
-        if ( call_sig == NULL || strcmp(call_sig, "(II)V") != 0 ) {
-            CRW_FATAL(&ci, "call_sig is not (II)V");
+        if ( call_sig == NULL || strcmp(call_sig, "(Ljava/lang/Object;)V") != 0 ) {
+            CRW_FATAL(&ci, "call_sig is not (Ljava/lang/Object;)V");
         }
     }
     if ( return_name != NULL ) {
-        if ( return_sig == NULL || strcmp(return_sig, "(II)V") != 0 ) {
-            CRW_FATAL(&ci, "return_sig is not (II)V");
+        if ( return_sig == NULL || strcmp(return_sig, "(Ljava/lang/Object;)V") != 0 ) {
+            CRW_FATAL(&ci, "return_sig is not (Ljava/lang/Object;)V");
         }
     }
     if ( obj_init_name != NULL ) {

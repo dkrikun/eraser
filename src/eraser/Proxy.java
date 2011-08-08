@@ -22,21 +22,21 @@ public class Proxy
         }
     }
 
-    private static native void method_entry_(Object thread, int cnum, int mnum);
-    public static void method_entry(int cnum, int mnum)
+    private static native void method_entry_(Object thread, Object o);
+    public static void method_entry(Object o)
     {
         if( engaged != 0 )
         {
-            method_entry_(Thread.currentThread(), cnum, mnum);
+            method_entry_(Thread.currentThread(), o);
         }
     }
 
-    private static native void method_exit_(Object thread, int cnum, int mnum);
-    public static void method_exit(int cnum, int mnum)
+    private static native void method_exit_(Object thread, Object o);
+    public static void method_exit(Object o)
     {
         if( engaged != 0 )
         {
-            method_exit_(Thread.currentThread(), cnum, mnum);
+            method_exit_(Thread.currentThread(), o);
         }
     }
 }

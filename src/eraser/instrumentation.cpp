@@ -52,8 +52,8 @@ void mnr( unsigned ccount, const char** method_names
                 //    method name           method signature                           routine to bind
                     { NATIVE_NEW_OBJ_METHOD, "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_newobj },
                     { NATIVE_NEW_ARR_METHOD, "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_newarr },
-                    { NATIVE_METHOD_ENTRY,   "(Ljava/lang/Object;II)V",                 (void*)native_method_entry },
-                    { NATIVE_METHOD_EXIT,    "(Ljava/lang/Object;II)V",                 (void*)native_method_exit }
+                    { NATIVE_METHOD_ENTRY,   "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_method_entry },
+                    { NATIVE_METHOD_EXIT,    "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_method_exit }
                 };
                 
                 jclass klass = jni->FindClass(PROXY_CLASS);
@@ -159,8 +159,8 @@ void mnr( unsigned ccount, const char** method_names
                              , is_system_class
                              , PROXY_CLASS
                              , "L" PROXY_CLASS ";"                        
-                             , METHOD_ENTRY, "(II)V"
-                             , METHOD_EXIT, "(II)V"
+                             , METHOD_ENTRY, "(Ljava/lang/Object;)V"
+                             , METHOD_EXIT, "(Ljava/lang/Object;)V"
                              , NEW_OBJ_METHOD, "(Ljava/lang/Object;)V"
                              , NEW_ARR_METHOD, "(Ljava/lang/Object;)V"
                              , &new_image
