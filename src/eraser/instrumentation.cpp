@@ -1,10 +1,16 @@
 
 #include <boost/utility.hpp>
+#include <boost/xpressive/xpressive.hpp>
+
 #include "eraser/instrumentation.h"
 #include "eraser/agent.h"
 #include "eraser/crw_hooks.h"
+
 #include "sun/agent_util.h"
 #include "sun/java_crw_demo.h"
+
+
+namespace xpr = boost::xpressive;
 
 namespace eraser
 {
@@ -117,9 +123,17 @@ void mnr( unsigned ccount, const char** method_names
                 // for debug, inst. only java.lang.Object for now
                 if( strcmp(classname, "java/lang/Object") != 0 )
                 {
-                        free((void*)classname);
-                        return;
+						// debugging, filter out all classes except for package "inc"
+						// nested packages are also filtered out here
+						xpr::cregex inc = xpr::as_xpr("inc/") >> +xpr::alnum;
+						if( !xpr::regex_match( classname, inc ) )
+						{
+							free((void*)classname);
+							return;
+						}
                 }
+
+				ERASER_LOG( classname );
 
                 // prevent self-instrumentation
                 if( strcmp(classname, PROXY_CLASS) == 0 )

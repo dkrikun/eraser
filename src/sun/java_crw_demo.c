@@ -851,10 +851,10 @@ entry_injection_code(MethodImage *mi, ByteCode *bytecodes, ByteOffset len)
         nbytes = injection_template(mi,
                             bytecodes, len, ci->object_init_tracker_index);
     }
-    if ( !mi->skip_call_return_sites ) {
-        nbytes += injection_template(mi,
-                    bytecodes+nbytes, len-nbytes, ci->call_tracker_index);
-    }
+//    if ( !mi->skip_call_return_sites ) {
+//        nbytes += injection_template(mi,
+//                    bytecodes+nbytes, len-nbytes, ci->call_tracker_index);
+//    }
     return nbytes;
 }
 
@@ -874,11 +874,23 @@ before_injection_code(MethodImage *mi, ClassOpcode opcode,
         case JVM_OPC_freturn:
         case JVM_OPC_dreturn:
         case JVM_OPC_areturn:
-            if ( !mi->skip_call_return_sites ) {
-                nbytes = injection_template(mi,
-                            bytecodes, len, mi->ci->return_tracker_index);
-            }
+//            if ( !mi->skip_call_return_sites ) {
+//                nbytes = injection_template(mi,
+//                            bytecodes, len, mi->ci->return_tracker_index);
+//            }
             break;
+        case JVM_OPC_monitorenter:
+        	nbytes = injection_template( mi
+        							   , bytecodes
+        							   , len
+        							   , mi->ci->call_tracker_index );
+        	break;
+        case JVM_OPC_monitorexit:
+        	nbytes = injection_template( mi
+									   , bytecodes
+									   , len
+									   , mi->ci->return_tracker_index );
+        	break;
         default:
             break;
     }

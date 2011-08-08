@@ -11,9 +11,9 @@ public class SynchWorker extends Worker
         public void run()
         {
                 sc.data = id;
-                synchronized(this)
+                for( int j=0; j<num_iter; ++j )
                 {
-                        for( int j=0; j<num_iter; ++j )
+                        synchronized(this)
                         {
                                 cell.data ++;
                                 cell.id = id;
