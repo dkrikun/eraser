@@ -28,7 +28,7 @@ struct thread_compare <jvmti_traits>
 	bool is_same( const thread_id_t& lhs, const thread_id_t& rhs ) const
 	{
 		bool res = agent::instance()->jni()->IsSameObject( lhs, rhs );
-		ERASER_LOG("thread compare res: " << res);
+		//ERASER_LOG("thread compare res: " << std::boolalpha<< res);
 		return res;
 
 	}

@@ -151,7 +151,7 @@ namespace shared_var_fsm
                 {
                     BOOST_ASSERT_MSG( from.last_accessing_thread_, "last_accessing_thread_ is supposed to be init. at this point");
                     bool res = evt.accessing_thread_ != from.last_accessing_thread_.get();
-#                   if defined( ERASER_DEBUG )
+#                   if 0 //defined( ERASER_DEBUG )
                     std::cout << "accessing thread= " << evt.accessing_thread_ << std::endl;
                     std::cout << "last acc. thread= " << from.last_accessing_thread_.get() << std::endl;
                     std::cout << "guard condition= " << std::boolalpha << res << std::endl;
@@ -227,7 +227,7 @@ namespace shared_var_fsm
     template <class EraserTraits>
     void shared_var<EraserTraits>::read( const thread_t& reader )
     {
-#			if defined( ERASER_DEBUG )
+#			if 0 //defined( ERASER_DEBUG )
     		std::cerr << "reader thread=" << reader << std::endl;
 #			endif
             impl_->process_event( shared_var_fsm::read<EraserTraits>(reader) );

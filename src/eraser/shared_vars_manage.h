@@ -68,14 +68,14 @@ inline const shared_var_t& get_shared_var( jobject field_object, jfieldID field_
 {
 	 try
 	 {
-		object_data* od = get_tag<object_data>(field_object);
-		BOOST_ASSERT( od != 0 );
-		return od->get_shared_var( field_id );
+		 object_data* od = get_tag<object_data>(field_object);
+		 BOOST_ASSERT( od != 0 );
+		 return od->get_shared_var( field_id );
 	 }
 	 catch( const std::out_of_range& e )
 	 {
-		std::cerr << "search in object shared vars failed" << std::endl;
-		throw;
+		 std::cerr << "search in object shared vars failed" << std::endl;
+		 throw;
 	 }
 }
 

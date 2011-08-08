@@ -22,8 +22,9 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
                 , jthread thread_id )
 {
 		jvmtiError err;
+
+#		if 0
 		ERASER_LOG( "thread_id=" << thread_id );
-#		if defined( ERASER_DEBUG )
 		agent::instance()->all_threads_dump();
 		agent::instance()->dump_thread_debug( thread_id );
 		ERASER_LOG( "thread_count=" << agent::instance()->all_threads().size() );
@@ -40,8 +41,6 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 			return;
 		}
 
-
-
 		jthread global_ref = agent::instance()->jni()->NewWeakGlobalRef( thread_id );
 		ERASER_LOG( "global_ref=" << global_ref );
 		if( global_ref == 0 )
@@ -52,7 +51,7 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 void thread_end( jvmtiEnv *jvmti, JNIEnv *jni
                 , jthread thread_id )
 {
-		ERASER_LOG( "thread_id=" << thread_id );
+		//ERASER_LOG( "thread_id=" << thread_id );
 		thread_t* od = get_tag<thread_t>( thread_id );
 		if( od == 0 )
 			return;
@@ -68,10 +67,14 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
                   , jobject object, jfieldID field )
 {
     	ERASER_LOG( "thread= " << thread_id
-    		<< " class " << agent::instance()->class_sig( field_klass )
-    		<< " field " << field );
+    		<< " object= " << object
+    		<< " class= " << agent::instance()->class_sig( field_klass )
+    		<< " field= " << field );
 
-        thread_t thread         = get_thread( thread_id );
+    	if( object == 0 )
+    		return;
+
+        thread_t thread = get_thread( thread_id );
         BOOST_ASSERT( agent::instance()->jni()->IsSameObject(thread.thread_id_,thread_id) );
         shared_var_t shared_var = get_shared_var( object, field );
 
@@ -86,8 +89,12 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
                    , char signature_type, jvalue new_value )
 {
         ERASER_LOG( "thread= " << thread_id
-        		<< " class " << agent::instance()->class_sig( field_klass )
-        		<< " field " << field );;
+        		<< " object= " << object
+        		<< " class= " << agent::instance()->class_sig( field_klass )
+        		<< " field= " << field );;
+
+        if( object == 0)
+        	return;
 
         thread_t thread         = get_thread( thread_id );
         BOOST_ASSERT( agent::instance()->jni()->IsSameObject(thread.thread_id_,thread_id) );

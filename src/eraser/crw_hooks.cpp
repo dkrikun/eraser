@@ -44,6 +44,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread, jobject o
         // set up read/write access watches
         for( size_t j=0; j<field_count; ++j )
         {
+        	ERASER_LOG( "field " << j << " " << fields[j] );
         	err = jvmti->SetFieldAccessWatch( cls, fields[j] );
     		// rude, probably better manage duplicates by ourselves
         	if( err != JVMTI_ERROR_NONE && err != JVMTI_ERROR_DUPLICATE )

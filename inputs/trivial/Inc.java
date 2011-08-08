@@ -33,6 +33,7 @@ public class Inc
 
 		cell.data = 1;
 		cell.id = 2;
+                cell.sdata = 3;
 		cell.subcell = new SubCell();
 		cell.subcell2 = cell.subcell;
 
