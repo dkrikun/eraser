@@ -9,11 +9,11 @@
 namespace eraser
 {
 
-template <class EraserTraits>
-struct thread_compare
+template <class Thread>
+struct thread_compare : std::binary_function< Thread, Thread, bool >
 {
-	typedef typename EraserTraits::thread_id_t thread_id_t;
-	bool is_same( const thread_id_t& lhs, const thread_id_t& rhs ) const
+	typedef Thread thread_id_t;
+	static bool is_equal( const thread_id_t& lhs, const thread_id_t& rhs )
 	{
 		return lhs == rhs;
 	}
@@ -21,11 +21,14 @@ struct thread_compare
 
 
 template <>
-struct thread_compare <jvmti_traits>
+struct thread_compare <jvmti_traits::thread_id_t>
+			: std::binary_function< jvmti_traits::thread_id_t
+								  , jvmti_traits::thread_id_t
+								  , bool >
 {
 
 	typedef jvmti_traits::thread_id_t thread_id_t;
-	bool is_same( const thread_id_t& lhs, const thread_id_t& rhs ) const
+	static bool is_equal( const thread_id_t& lhs, const thread_id_t& rhs )
 	{
 		bool res = agent::instance()->jni()->IsSameObject( lhs, rhs );
 		//ERASER_LOG("thread compare res: " << std::boolalpha<< res);
@@ -33,6 +36,8 @@ struct thread_compare <jvmti_traits>
 
 	}
 };
+
+
 
 }
 

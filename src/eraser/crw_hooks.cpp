@@ -4,8 +4,11 @@
 #include <boost/xpressive/xpressive.hpp>
 
 #include "eraser/crw_hooks.h"
+#include "eraser/vm_hooks.h"
 #include "eraser/agent.h"
 #include "eraser/shared_vars_manage.h"
+#include "eraser/thread.h"
+#include "eraser/traits.h"
 
 namespace xpr = boost::xpressive;
 
@@ -59,18 +62,30 @@ void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 {
 }
 
-void native_method_entry(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
+void native_method_entry(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
 		ERASER_LOG( "MONITOR ENTER"
-				<< " thread= " << thread
+				<< " thread= " << thread_id
 				<< " monitor= " << obj );
 
+        thread_t thread = get_thread( thread_id );
+        jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
+        if( global_ref == 0 )
+        			fatal_error("Out of memory while trying to create new global ref.");
+        thread.lock( lock(global_ref) );
+
 }
-void native_method_exit(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
+void native_method_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
 		ERASER_LOG( "MONITOR EXIT"
-			<< " thread= " << thread
+			<< " thread= " << thread_id
 			<< " monitor= " << obj );
+
+		thread_t thread = get_thread( thread_id );
+		jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
+        if( global_ref == 0 )
+        			fatal_error("Out of memory while trying to create new global ref.");
+		thread.unlock( lock(global_ref) );
 }
 
 }

@@ -8,9 +8,7 @@
 
 // debug
 #include <vector>
-
 #include "sun/agent_util.h"
-#include "eraser/traits.h"
 
 namespace eraser
 {

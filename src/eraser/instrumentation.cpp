@@ -1,4 +1,6 @@
 
+#include <fstream>
+
 #include <boost/utility.hpp>
 #include <boost/xpressive/xpressive.hpp>
 
@@ -167,10 +169,19 @@ void mnr( unsigned ccount, const char** method_names
                     	     , &new_length
                              , 0, 0 );
                 
+                std::string class_dump_name( classname );
+                class_dump_name += "_dump.class";
+
+
                 
                 // memcpy transformed classfile to jvmti allocated memory
                 if( new_length > 0 )
                 {
+                    //std::ofstream class_dump( class_dump_name.c_str() );
+                	std::ofstream class_dump( "dump", std::ofstream::binary );
+                    class_dump.write( (const char*)new_image, (std::streamsize)new_length );
+                    class_dump.close();
+
                     unsigned char *jvmtispace = (unsigned char *)allocate( jvmti, (jint)new_length );
                     memcpy( (void*)jvmtispace, (void*)new_image, new_length );
                 

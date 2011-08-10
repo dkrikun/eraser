@@ -5,21 +5,24 @@
 #include <boost/optional/optional.hpp>
 #include <boost/assert.hpp>
 #include <boost/operators.hpp>
+#include <boost/unordered_set.hpp>
 #include <boost/concept_check.hpp>
 #include <set>
 #include <iterator>
+
 
 namespace eraser
 {
 
         
-template <class T>
+template < class T >
 struct universal_set : boost::operators< universal_set<T> >
 {
         BOOST_CONCEPT_ASSERT((boost::Assignable<T>));
+        //BOOST_CONCEPT_ASSERT((boost::AdaptableBinaryPredicate<Compare>)); // not working
 
         private:
-        typedef typename std::set<T>                  container_t;
+        typedef typename boost::unordered_set<T>      container_t;
         typedef typename container_t::iterator        iterator;
         typedef typename container_t::const_iterator  const_iterator;
 
@@ -50,24 +53,7 @@ struct universal_set : boost::operators< universal_set<T> >
         private:
         void in_place_intersect( container_t& lhs, const container_t& rhs )
         {
-
-                iterator lhs_it = lhs.begin();
-                iterator rhs_it = rhs.begin();
-
-                while( (lhs_it != lhs.end()) && (rhs_it != rhs.end()) )
-                {
-                        if(*lhs_it < *rhs_it)
-                                lhs.erase(lhs_it++);
-
-                        else if(*rhs_it < *lhs_it)
-                                ++rhs_it;
-                        else
-                        {
-                            ++lhs_it;
-                            ++rhs_it;
-                        }
-                }
-                lhs.erase( lhs_it, lhs.end() );
+        	// TODO implement this, unit test supplied
         }
 
 
@@ -133,7 +119,7 @@ struct universal_set : boost::operators< universal_set<T> >
 
 };
 
-template <class T>
+template <class T >
 struct shared_var_set : public universal_set<T>
 {
         shared_var_set() : universal_set<T>(true){}
@@ -142,7 +128,7 @@ struct shared_var_set : public universal_set<T>
                 void insert( const T& );
 };
 
-template <class T>
+template <class T >
 struct thread_set : public universal_set<T>
 {
         thread_set() : universal_set<T>(false){}

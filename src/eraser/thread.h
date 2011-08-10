@@ -9,7 +9,7 @@
 namespace eraser
 {
         template <class EraserTraits >
-        struct thread : thread_compare<EraserTraits>
+        struct thread : thread_compare<typename EraserTraits::thread_id_t>
         			  , boost::operators< thread<EraserTraits> >
         {
                 typedef typename EraserTraits::thread_id_t        thread_id_t;
@@ -49,7 +49,7 @@ namespace eraser
 
                 bool operator==(const thread& rhs) const
                 {
-                        return thread_compare<EraserTraits>::is_same(thread_id_, rhs.thread_id_);
+                        return thread_compare<thread_id_t>::is_equal(thread_id_, rhs.thread_id_);
                 }
         };
 
