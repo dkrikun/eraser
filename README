@@ -1,6 +1,6 @@
 
 Using:
-        boost 1.47.1
+        boost 1.46.0
         java-6-sun-1.6.0.21
         Ubuntu 10.10
         g++ (Ubuntu/Linaro 4.4.4-14ubuntu5) 4.4.5
