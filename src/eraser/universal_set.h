@@ -53,7 +53,20 @@ struct universal_set : boost::operators< universal_set<T> >
         private:
         void in_place_intersect( container_t& lhs, const container_t& rhs )
         {
-        	// TODO implement this, unit test supplied
+        	iterator it_lhs = lhs.begin();
+
+        	while( it_lhs != lhs.end() )
+        	{
+        		for( const_iterator it_rhs = rhs.begin(); it_rhs != rhs.end(); ++ it_rhs )
+        		{
+        			if( *it_lhs == *it_rhs )
+        			{
+        				it_lhs = lhs.erase( it_lhs );
+        				break;
+        			}
+        		}
+        		it_lhs ++;
+        	}
         }
 
 

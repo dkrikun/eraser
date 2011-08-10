@@ -49,6 +49,7 @@ exe universal_set
                   <include>/home/daniel/work/tools/gmock-1.6.0/include
                   <include>/home/daniel/work/tools/gmock-1.6.0/gtest/include
                   <threading>multi
+                  <define>ERASER_TESTING
           ;
 
 exe shared_var
@@ -62,6 +63,7 @@ exe shared_var
                   <include>/home/daniel/work/tools/gmock-1.6.0/include
                   <include>/home/daniel/work/tools/gmock-1.6.0/gtest/include
                   <threading>multi
+                  <define>ERASER_TESTING
           ;
 
 exe locked
@@ -75,4 +77,5 @@ exe locked
                   <include>/home/daniel/work/tools/gmock-1.6.0/include
                   <include>/home/daniel/work/tools/gmock-1.6.0/gtest/include
                   <threading>multi
+                  <define>ERASER_TESTING
           ;
