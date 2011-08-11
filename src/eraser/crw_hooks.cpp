@@ -45,6 +45,9 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread, jobject o
         init_object_data( obj, cls, fields, (size_t)field_count );
 
         // set up read/write access watches
+        // this also includes static variables (duplicated over all instances)
+        // this is not clever, and anyway we cannot fetch the object tag from within
+        // field access events, because there is no object!
         for( size_t j=0; j<field_count; ++j )
         {
         	ERASER_LOG( "field " << j << " " << fields[j] );
@@ -62,7 +65,7 @@ void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 {
 }
 
-void native_method_entry(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
+void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
 		ERASER_LOG( "MONITOR ENTER"
 				<< " thread= " << thread_id
@@ -75,13 +78,14 @@ void native_method_entry(JNIEnv *jni, jclass klass, jthread thread_id, jobject o
         thread.lock( lock(global_ref) );
 
 }
-void native_method_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
+void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
 		ERASER_LOG( "MONITOR EXIT"
 			<< " thread= " << thread_id
 			<< " monitor= " << obj );
 
 		thread_t thread = get_thread( thread_id );
+		// do we really need a global reference here?
 		jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         			fatal_error("Out of memory while trying to create new global ref.");

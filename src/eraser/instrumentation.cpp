@@ -31,14 +31,14 @@ void mnr( unsigned ccount, const char** method_names
 
 #       define PROXY_CLASS               "Proxy"
 #       define ENGAGED_FIELD             "engaged"
-#       define METHOD_ENTRY              "method_entry"
-#       define METHOD_EXIT               "method_exit"
+#       define MONITOR_ENTER             "monitor_enter"
+#       define MONITOR_EXIT              "monitor_exit"
 #       define NEW_OBJ_METHOD            "newobj"
 #       define NEW_ARR_METHOD            "newarr"
 #       define NATIVE_NEW_OBJ_METHOD     "newobj_"
 #       define NATIVE_NEW_ARR_METHOD     "newarr_"
-#       define NATIVE_METHOD_ENTRY       "method_entry_"
-#       define NATIVE_METHOD_EXIT        "method_exit_"
+#       define NATIVE_MONITOR_ENTER      "monitor_enter_"
+#       define NATIVE_MONITOR_EXIT       "monitor_exit_"
 
         /*
          * Set up object & array creation hooks.
@@ -54,8 +54,8 @@ void mnr( unsigned ccount, const char** method_names
                 //    method name           method signature                           routine to bind
                     { NATIVE_NEW_OBJ_METHOD, "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_newobj },
                     { NATIVE_NEW_ARR_METHOD, "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_newarr },
-                    { NATIVE_METHOD_ENTRY,   "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_method_entry },
-                    { NATIVE_METHOD_EXIT,    "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_method_exit }
+                    { NATIVE_MONITOR_ENTER,   "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_monitor_enter },
+                    { NATIVE_MONITOR_EXIT,    "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_monitor_exit }
                 };
                 
                 jclass klass = jni->FindClass(PROXY_CLASS);
@@ -161,8 +161,8 @@ void mnr( unsigned ccount, const char** method_names
                              , is_system_class
                              , PROXY_CLASS
                              , "L" PROXY_CLASS ";"                        
-                             , METHOD_ENTRY, "(Ljava/lang/Object;)V"
-                             , METHOD_EXIT, "(Ljava/lang/Object;)V"
+                             , MONITOR_ENTER, "(Ljava/lang/Object;)V"
+                             , MONITOR_EXIT, "(Ljava/lang/Object;)V"
                              , NEW_OBJ_METHOD, "(Ljava/lang/Object;)V"
                              , NEW_ARR_METHOD, "(Ljava/lang/Object;)V"
                              , &new_image

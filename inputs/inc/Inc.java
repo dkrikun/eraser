@@ -29,22 +29,22 @@ public class Inc
                 //readLine();
 
                 Cell cell = new Cell();
-                Cell cell2 = new Cell();
+            //  Cell cell2 = new Cell();
 
-            //  if(is_synched)
-            //          for (int i = 0; i < num_threads; i++)
-            //                  new SynchWorker(i,cell, num_iter).run();
-            //  else
-            //          for (int i = 0; i < num_threads; i++)
-            //                  new Worker(i,cell, num_iter).run();
-                Worker w1 = new Worker( 0, cell, num_iter ); 
-                Worker w2 = new Worker( 1, cell, num_iter ); 
-                Worker w3 = new Worker( 2, cell, num_iter ); 
-                Worker w4 = new Worker( 3, cell, num_iter ); 
-                w1.run();
-                w2.run();
-                w3.run();
-                w4.run();
+                if(is_synched)
+                        for (int i = 0; i < num_threads; i++)
+                                new SynchWorker(i,cell, num_iter).run();
+                else
+                        for (int i = 0; i < num_threads; i++)
+                                new Worker(i,cell, num_iter).run();
+            //  Worker w1 = new Worker( 0, cell, num_iter ); 
+            //  Worker w2 = new Worker( 1, cell, num_iter ); 
+            //  Worker w3 = new Worker( 2, cell, num_iter ); 
+            //  Worker w4 = new Worker( 3, cell, num_iter ); 
+            //  w1.run();
+            //  w2.run();
+            //  w3.run();
+            //  w4.run();
 
                 System.out.println("Result: " + cell.data + " " + cell.id);
         }
