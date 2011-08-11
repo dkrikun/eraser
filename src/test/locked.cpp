@@ -192,5 +192,85 @@ TEST_( Test_that_shared_read_with_different_locks_ok )
         thread_2.unlock( l2 );
 }
 
+TEST_( Test_that_lock_twice_same_lock_then_unlock_once_concurrent_write_ok )
+{
+        EXPECT_NO_ALARM();
+
+        // init, go to exclusive
+        uut.write( thread_3 );
+
+        thread_1.lock( l1 );
+        thread_1.lock( l1 );
+        thread_1.unlock( l1 );
+        // still has l1
+        uut.write( thread_1 );
+
+        thread_2.lock( l1 );
+        uut.write( thread_2 );
+        thread_2.unlock( l1 );
+
+        thread_1.unlock( l1 );
+}
+
+TEST_( Test_that_lock_twice_different_locks_then_unlock_once_concurrent_write_ok_1 )
+{
+        EXPECT_NO_ALARM();
+
+        // init, go to exclusive
+        uut.write( thread_3 );
+
+        thread_1.lock( l1 );
+        thread_1.lock( l2 );
+        thread_1.unlock( l1 );
+        // still has l2
+        uut.write( thread_1 );
+
+        thread_2.lock( l2 );
+        uut.write( thread_2 );
+        thread_2.unlock( l2 );
+
+        thread_1.unlock( l1 );
+}
+
+TEST_( Test_that_lock_twice_different_locks_then_unlock_once_concurrent_write_ok_2 )
+{
+        EXPECT_NO_ALARM();
+
+        // init, go to exclusive
+        uut.write( thread_3 );
+
+        thread_1.lock( l1 );
+        thread_1.lock( l2 );
+        thread_1.unlock( l2 );
+        // still has l1
+        uut.write( thread_1 );
+
+        thread_2.lock( l1 );
+        uut.write( thread_2 );
+        thread_2.unlock( l1 );
+
+        thread_1.unlock( l2 );
+}
+
+TEST_( Test_that_lock_twice_different_locks_then_unlock_once_but_other_thread_holds_another_lock_alarms )
+{
+		EXPECT_ALARM(1);
+
+        // init, go to exclusive
+        uut.write( thread_3 );
+
+        thread_1.lock( l1 );
+        thread_1.lock( l2 );
+        thread_1.unlock( l1 );
+        // still has l2
+        uut.write( thread_1 );
+
+        thread_2.lock( l1 );
+        uut.write( thread_2 );
+        thread_2.unlock( l1 );
+
+        thread_1.unlock( l2 );
+}
+
 
 }

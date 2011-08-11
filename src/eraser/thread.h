@@ -28,23 +28,29 @@ namespace eraser
                 void lock( lock_id_t lock )
                 {
                         locks_held_.insert( lock );
+                        ERASER_LOG( "locks_held: " << locks_held_ );
                 }
 
                 void write_lock( lock_id_t lock )
                 {
                         locks_held_.insert( lock );
                         write_locks_held_.insert( lock );
+                        ERASER_LOG( "locks_held: " << locks_held_ );
+                        ERASER_LOG( "write_locks_held: " << write_locks_held_ );
                 }
 
                 void unlock( lock_id_t lock )
                 {
                         locks_held_.erase( lock );
+                        ERASER_LOG( "locks_held: " << locks_held_ );
                 }
 
                 void write_unlock( lock_id_t lock )
                 {
                         locks_held_.erase( lock );
                         write_locks_held_.erase( lock );
+                        ERASER_LOG( "locks_held: " << locks_held_ );
+                        ERASER_LOG( "write_locks_held: " << write_locks_held_ );
                 }
 
                 bool operator==(const thread& rhs) const

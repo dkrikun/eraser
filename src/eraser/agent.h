@@ -13,11 +13,15 @@
 namespace eraser
 {
 
+# if defined( ERASER_DEBUG )
 # define ERASER_LOG(msg)\
 	eraser::agent::instance()->logger_											\
 		<< "[" << __FILE__ << "|" <<  __LINE__ << "|" << __FUNCTION__ << "] "	\
 		<< msg																	\
 		<< std::endl;
+# else
+# define ERASER_LOG(msg) //nop
+# endif
 
 struct agent : boost::noncopyable
 {

@@ -79,6 +79,7 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
         shared_var_t shared_var = get_shared_var( object, field );
 
         ERASER_LOG( "thread_t= " << thread );
+        ERASER_LOG( "READ ");
         shared_var.read( thread );
 }
 
@@ -101,6 +102,7 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
         shared_var_t shared_var = get_shared_var( object, field );
 
         ERASER_LOG( "thread_t= " << thread );
+        ERASER_LOG( "WRITE ");
         shared_var.write( thread );
 }
 

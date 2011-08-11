@@ -53,11 +53,6 @@ using ::testing::_;
                 .Times((count));
 
 
-TEST_( test_that_virgin_read_fails )
-{
-        EXPECT_DEATH( uut.read( thread_1 ), ".*No transition in fsm.*" );
-}
-
 TEST_( test_that_virgin_write_ok )
 {
         EXPECT_NO_ALARM(); 
@@ -144,5 +139,7 @@ TEST_( test_that_concurrent_write_after_shared_read_by_old_thread_when_unlocked_
         uut.read( thread_2 );   // transition to shared-read
         uut.write( thread_1 );  // transition to shared-write (by first thread)
 }
+
+
 
 }
