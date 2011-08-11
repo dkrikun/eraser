@@ -19,24 +19,28 @@ public class Inc
         {
                 if(argv.length < 3)
                 {
-                        System.err.println("inc num_threads num_iter is_synched");
+                        System.err.println("<inc> num_threads num_iter worker_kind(0,1,2)");
                         return;
                 }
                 int num_threads = Integer.parseInt(argv[0]);
                 int num_iter = Integer.parseInt(argv[1]);
-                boolean is_synched = Boolean.parseBoolean(argv[2]);
+                int worker_kind = Integer.parseInt(argv[2]);
 
                 //readLine();
 
                 Cell cell = new Cell();
             //  Cell cell2 = new Cell();
 
-                if(is_synched)
+                if( worker_kind == 0 )
+                        for (int i = 0; i < num_threads; i++)
+                                new Worker(i,cell, num_iter).run();
+                else if( worker_kind == 1 )
                         for (int i = 0; i < num_threads; i++)
                                 new SynchWorker(i,cell, num_iter).run();
                 else
                         for (int i = 0; i < num_threads; i++)
-                                new Worker(i,cell, num_iter).run();
+                                new MethodSynchWorker(i,cell, num_iter).run();
+
             //  Worker w1 = new Worker( 0, cell, num_iter ); 
             //  Worker w2 = new Worker( 1, cell, num_iter ); 
             //  Worker w3 = new Worker( 2, cell, num_iter ); 
