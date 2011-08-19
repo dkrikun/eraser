@@ -5,11 +5,14 @@
 #include <jvmti.h>
 #include <boost/utility.hpp>
 #include <boost/assert.hpp>
+#include <boost/program_options.hpp>
 
 // debug
 #include <vector>
 #include "sun/agent_util.h"
 #include "eraser/logger.h"
+
+namespace po = boost::program_options;
 
 namespace eraser
 {
@@ -22,6 +25,7 @@ struct agent : boost::noncopyable
         jrawMonitorID            monitor_;
         bool                     death_active_;
         bool					 met_destroy_jvm_thread_;
+        std::string 			 filter_regex_;
 
         jvmtiPhase phase() const
         {
@@ -74,50 +78,25 @@ struct agent : boost::noncopyable
         			<< " is_daemon= " << (int)ti.is_daemon
         			<< " thread_group= " << ti.thread_group
         			<< " cls_loader= " << ti.context_class_loader );
-
         }
 
-        jthread last_thread_;
-        bool first_;
-        bool same_as_last_thread( jthread thread ) const
+        void config( const std::string& args )
         {
-        	if( first_ )
-        		return false;
-        	else return jni()->IsSameObject( last_thread_, thread );
-        }
-        void update_last_thread( jthread thread )
-        {
-        	first_ = false;
-        	last_thread_ = thread;
-        }
+        	po::options_description desc("Allowed options");
 
-        jthread fr_last_thread_;
-        bool fr_first_;
-        bool fr_same_as_last_thread( jthread thread ) const
-        {
-        	if( fr_first_ )
-        		return false;
-        	else return jni()->IsSameObject( fr_last_thread_, thread );
-        }
-        void fr_update_last_thread( jthread thread )
-        {
-        	fr_first_ = false;
-        	fr_last_thread_ = thread;
-        }
+        	desc.add_options()
+        	    ("help", "produce help message")
+        	    ("filter", po::value< std::string >()->default_value(""), "regex to match classes for instrumentation")
+        	;
 
-        jthread fw_last_thread_;
-                bool fw_first_;
-                bool fw_same_as_last_thread( jthread thread ) const
-                {
-                	if( fw_first_ )
-                		return false;
-                	else return jni()->IsSameObject( fw_last_thread_, thread );
-                }
-                void fw_update_last_thread( jthread thread )
-                {
-                	fw_first_ = false;
-                	fw_last_thread_ = thread;
-                }
+        	po::variables_map vm;
+        	std::vector<std::string> split_args = po::split_unix( args, "," );
+        	po::store( po::command_line_parser(split_args).options(desc).run(), vm );
+        	po::notify( vm );
+
+        	if( vm.count("filter") )
+        		filter_regex_ = vm["filter"].as<std::string>();
+        }
 
 
         static agent* instance()
@@ -153,9 +132,6 @@ struct agent : boost::noncopyable
                 : jvmti_(0)
 				, jni_(0)
         		, met_destroy_jvm_thread_( false )
-        		, first_( true )
-        		, fr_first_( true )
-        		, fw_first_( true )
         {}
 };
 

@@ -70,9 +70,6 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
         thread_t* thread 		 = get_thread( thread_id );
         shared_var_t* shared_var = get_shared_var( object, field );
 
-        LOG_DEBUG( "FR same as last: " << std::boolalpha << agent::instance()->fr_same_as_last_thread( thread_id ) );
-        agent::instance()->fr_update_last_thread( thread_id );
-
         LOG_INFO( "thread_t= " << *thread );
 
         shared_var->read( *thread );
@@ -92,9 +89,6 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
 
         thread_t* thread         = get_thread( thread_id );
         shared_var_t* shared_var = get_shared_var( object, field );
-
-        LOG_DEBUG( "FW same as last: " << std::boolalpha << agent::instance()->fw_same_as_last_thread( thread_id ) );
-        agent::instance()->fw_update_last_thread( thread_id );
 
         LOG_INFO( "thread_t= " << *thread );
         shared_var->write( *thread );

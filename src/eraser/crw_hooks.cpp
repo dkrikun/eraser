@@ -72,25 +72,7 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
 				<< " thread= " << thread_id
 				<< " monitor= " << obj );
 
-#		if defined ( ERASER_DEBUG )
-		jthread global_refa = agent::instance()->jni()->NewGlobalRef( thread_id );
-		if( global_refa == 0 )
-			fatal_error("Out of memory while trying to create new global ref.");
-        LOG_DEBUG( "SAME? " << std::boolalpha << agent::instance()->same_as_last_thread( thread_id ) );
-        agent::instance()->update_last_thread( global_refa );
-
-//		static jthread last_thread;
-//		bool res = agent::instance()->jni()->IsSameObject( last_thread, thread_id );
-//		ERASER_LOG( "SAME?" << std::boolalpha << res );
-//		last_thread = agent::instance()->jni()->NewGlobalRef(thread_id);
-
-        agent::instance()->dump_thread_debug( thread_id );
-# 	    endif
-
-        static thread_t* last(0);
         thread_t* thread = get_thread( thread_id );
-        LOG_DEBUG( "SAME SAME??" << std::boolalpha << (last == thread) );
-        last = thread;
         jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         			fatal_error("Out of memory while trying to create new global ref.");

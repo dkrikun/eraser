@@ -147,6 +147,11 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         err = jvmti->CreateRawMonitor("agent lock", &(eraser::agent::instance()->monitor_));
         check_jvmti_error(jvmti, err, "create raw monitor");
         
+        if( options != 0 )
+        {
+        	eraser::agent::instance()->config( options );
+        }
+
         // set capabilities
         jvmtiCapabilities   capabilities;
         memset(&capabilities, 0, sizeof(capabilities));
