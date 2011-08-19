@@ -71,7 +71,7 @@ TEST_( test_that_thread_set_can_erase_one_correctly )
         uut.insert( e1 );
 
         EXPECT_FALSE( uut.empty() );
-        EXPECT_EQ( uut.erase( e1 ), 1 );
+        uut.erase( e1 );
         EXPECT_TRUE( uut.empty() );
 }
 
@@ -86,9 +86,9 @@ TEST_( test_that_thread_set_no_duplicates )
         uut.insert( e2 );
         uut.insert( e3 );
 
-        EXPECT_EQ( uut.erase( e1 ), 1 );
-        EXPECT_EQ( uut.erase( e2 ), 1 );
-        EXPECT_EQ( uut.erase( e3 ), 0 );
+        uut.erase( e1 );
+        uut.erase( e2 );
+        uut.erase( e3 );
         EXPECT_TRUE( uut.empty() );
 }
 

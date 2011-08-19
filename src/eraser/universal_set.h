@@ -5,9 +5,8 @@
 #include <boost/optional/optional.hpp>
 #include <boost/assert.hpp>
 #include <boost/operators.hpp>
-#include <boost/unordered_set.hpp>
 #include <boost/concept_check.hpp>
-#include <set>
+#include <list>
 #include <iterator>
 
 
@@ -19,10 +18,11 @@ template < class T >
 struct universal_set : boost::operators< universal_set<T> >
 {
         BOOST_CONCEPT_ASSERT((boost::Assignable<T>));
+        BOOST_CONCEPT_ASSERT((boost::EqualityComparable<T>));
         //BOOST_CONCEPT_ASSERT((boost::AdaptableBinaryPredicate<Compare>)); // not working
 
         private:
-        typedef typename boost::unordered_set<T>      container_t;
+        typedef typename std::list<T>			      container_t;
         typedef typename container_t::iterator        iterator;
         typedef typename container_t::const_iterator  const_iterator;
 
@@ -77,14 +77,16 @@ struct universal_set : boost::operators< universal_set<T> >
         {
                 if( universal() )
                         return;
-                storage_->insert(x);
+                storage_->push_back(x);
         }
 
-        size_t erase( const T& x )
+        void erase( const T& x )	// erase one element equal to x
         {
                 if( universal() )
                         BOOST_ASSERT_MSG( storage_, "erasure from universal set is not supported" );
-                return storage_->erase(x);
+                iterator it = std::find( storage_->begin(), storage_->end(), x );
+                if( it != storage_->end() )
+                	storage_->erase(it);
         }
 
         bool universal() const
