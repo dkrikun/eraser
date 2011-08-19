@@ -86,8 +86,51 @@ struct agent : boost::noncopyable
         			<< " cls_loader= " << ti.context_class_loader );
 
         }
+
+
 #		endif
 
+        jthread last_thread_;
+        bool first_;
+        bool same_as_last_thread( jthread thread ) const
+        {
+        	if( first_ )
+        		return false;
+        	else return jni()->IsSameObject( last_thread_, thread );
+        }
+        void update_last_thread( jthread thread )
+        {
+        	first_ = false;
+        	last_thread_ = thread;
+        }
+
+        jthread fr_last_thread_;
+        bool fr_first_;
+        bool fr_same_as_last_thread( jthread thread ) const
+        {
+        	if( fr_first_ )
+        		return false;
+        	else return jni()->IsSameObject( fr_last_thread_, thread );
+        }
+        void fr_update_last_thread( jthread thread )
+        {
+        	fr_first_ = false;
+        	fr_last_thread_ = thread;
+        }
+
+        jthread fw_last_thread_;
+                bool fw_first_;
+                bool fw_same_as_last_thread( jthread thread ) const
+                {
+                	if( fw_first_ )
+                		return false;
+                	else return jni()->IsSameObject( fw_last_thread_, thread );
+                }
+                void fw_update_last_thread( jthread thread )
+                {
+                	fw_first_ = false;
+                	fw_last_thread_ = thread;
+                }
 
 
         static agent* instance()
@@ -124,6 +167,9 @@ struct agent : boost::noncopyable
 				, jni_(0)
         		, logger_( std::cerr )
         		, met_destroy_jvm_thread_( false )
+        		, first_( true )
+        		, fr_first_( true )
+        		, fw_first_( true )
         {}
 };
 

@@ -25,11 +25,14 @@ public class Cell
 
                 synchronized(W)
                 {
-                        int z = 6;
-                }
-                synchronized(E)
-                {
-                        int t = 6;
+                        synchronized(E)
+                        {
+                                synchronized(E)
+                                {
+                                        int t = 6;
+                                }
+                                int v = this.id;
+                        }
                 }
         }
 }

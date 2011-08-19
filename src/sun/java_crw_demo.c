@@ -226,6 +226,9 @@ typedef struct MethodImage {
     /* Method access flags gotten from file. */
     unsigned            access_flags;
 
+    /* Whether monitor enter/exit or synchronized method*/
+    jboolean			synch_method;
+
 } MethodImage;
 
 /* ----------------------------------------------------------------- */
@@ -791,8 +794,16 @@ injection_template(MethodImage *mi, ByteCode *bytecodes, ByteOffset max_nbytes,
         add_aload       = JNI_TRUE;
 
     } else {
-    	add_dup         = JNI_FALSE;
-    	add_aload       = JNI_TRUE;
+    	if( mi->synch_method == JNI_TRUE )
+    	{
+			add_dup         = JNI_FALSE;
+			add_aload       = JNI_TRUE;
+    	}
+    	else
+    	{
+			add_dup         = JNI_TRUE;
+			add_aload       = JNI_FALSE;
+    	}
     }
 	max_stack       = mi->max_stack + 1;
     push_cnum       = JNI_FALSE;
@@ -847,6 +858,7 @@ entry_injection_code(MethodImage *mi, ByteCode *bytecodes, ByteOffset len)
                             bytecodes, len, ci->object_init_tracker_index);
     }
     if ( !mi->skip_call_return_sites && ( mi->access_flags & JVM_ACC_SYNCHRONIZED )) {
+    	mi->synch_method = JNI_TRUE;
         nbytes += injection_template(mi,
                     bytecodes+nbytes, len-nbytes, ci->call_tracker_index);
     }
@@ -870,17 +882,20 @@ before_injection_code(MethodImage *mi, ClassOpcode opcode,
         case JVM_OPC_dreturn:
         case JVM_OPC_areturn:
             if ( !mi->skip_call_return_sites && ( mi->access_flags & JVM_ACC_SYNCHRONIZED ) ) {
+            	mi->synch_method = JNI_TRUE;
                 nbytes = injection_template(mi,
                             bytecodes, len, mi->ci->return_tracker_index);
             }
             break;
         case JVM_OPC_monitorenter:
+        	mi->synch_method = JNI_FALSE;
         	nbytes = injection_template( mi
         							   , bytecodes
         							   , len
         							   , mi->ci->call_tracker_index );
         	break;
         case JVM_OPC_monitorexit:
+        	mi->synch_method = JNI_FALSE;
         	nbytes = injection_template( mi
 									   , bytecodes
 									   , len

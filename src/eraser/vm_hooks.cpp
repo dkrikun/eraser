@@ -14,6 +14,7 @@ const thread_t& get_thread( jthread thread_id )
 {
 		thread_t* od = get_tag<thread_t>( thread_id );
 		BOOST_ASSERT( od != 0 );
+        BOOST_ASSERT( agent::instance()->jni()->IsSameObject( od->thread_id_, thread_id ));
 		return *od;
 }
 
@@ -75,8 +76,10 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
     		return;
 
         thread_t thread = get_thread( thread_id );
-        BOOST_ASSERT( agent::instance()->jni()->IsSameObject(thread.thread_id_,thread_id) );
         shared_var_t shared_var = get_shared_var( object, field );
+
+        ERASER_LOG( "FR same as last: " << std::boolalpha << agent::instance()->fr_same_as_last_thread( thread_id ) );
+        agent::instance()->fr_update_last_thread( thread_id );
 
         ERASER_LOG( "thread_t= " << thread );
         ERASER_LOG( "READ ");
@@ -98,8 +101,10 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
         	return;
 
         thread_t thread         = get_thread( thread_id );
-        BOOST_ASSERT( agent::instance()->jni()->IsSameObject(thread.thread_id_,thread_id) );
         shared_var_t shared_var = get_shared_var( object, field );
+
+        ERASER_LOG( "FW same as last: " << std::boolalpha << agent::instance()->fw_same_as_last_thread( thread_id ) );
+        agent::instance()->fw_update_last_thread( thread_id );
 
         ERASER_LOG( "thread_t= " << thread );
         ERASER_LOG( "WRITE ");
