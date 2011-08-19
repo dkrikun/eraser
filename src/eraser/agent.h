@@ -9,19 +9,11 @@
 // debug
 #include <vector>
 #include "sun/agent_util.h"
+#include "eraser/logger.h"
 
 namespace eraser
 {
 
-# if defined( ERASER_DEBUG )
-# define ERASER_LOG(msg)\
-	eraser::agent::instance()->logger_											\
-		<< "[" << __FILE__ << "|" <<  __LINE__ << "|" << __FUNCTION__ << "] "	\
-		<< msg																	\
-		<< std::endl;
-# else
-# define ERASER_LOG(msg) //nop
-# endif
 
 struct agent : boost::noncopyable
 {
@@ -29,7 +21,6 @@ struct agent : boost::noncopyable
         JNIEnv*                  jni_;
         jrawMonitorID            monitor_;
         bool                     death_active_;
-        std::ostream&			 logger_;
         bool					 met_destroy_jvm_thread_;
 
         jvmtiPhase phase() const
@@ -41,7 +32,6 @@ struct agent : boost::noncopyable
                 return res;
         }
 
-#		if defined( ERASER_DEBUG )
         void all_threads_dump() const
         {
 
@@ -74,21 +64,18 @@ struct agent : boost::noncopyable
         	jint thread_state;
         	err = jvmti()->GetThreadState( thread, &thread_state );
         	check_jvmti_error( jvmti(), err, "get thread state" );
-        	ERASER_LOG( "thread state= " << thread_state );
+          	LOG_DEBUG( "thread state= " << thread_state );
         	jvmtiThreadInfo ti;
         	memset( &ti, 0, sizeof(ti) );
         	err = jvmti()->GetThreadInfo( thread, &ti );
         	check_jvmti_error( jvmti(), err, "get thread info" );
-        	ERASER_LOG( "thread name= " << ti.name
+        	LOG_DEBUG( "thread name= " << ti.name
         			<< " priority= " << ti.priority
         			<< " is_daemon= " << (int)ti.is_daemon
         			<< " thread_group= " << ti.thread_group
         			<< " cls_loader= " << ti.context_class_loader );
 
         }
-
-
-#		endif
 
         jthread last_thread_;
         bool first_;
@@ -165,7 +152,6 @@ struct agent : boost::noncopyable
         agent()
                 : jvmti_(0)
 				, jni_(0)
-        		, logger_( std::cerr )
         		, met_destroy_jvm_thread_( false )
         		, first_( true )
         		, fr_first_( true )

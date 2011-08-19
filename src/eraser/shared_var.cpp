@@ -9,6 +9,7 @@
 #include <boost/optional/optional.hpp>
 
 #include "eraser/shared_var.h"
+#include "eraser/logger.h"
 
 
 namespace msm = boost::msm;
@@ -85,14 +86,14 @@ namespace shared_var_fsm
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
-#						if defined( ERASER_DEBUG )
-                		std::cerr << "last acc. thread=";
+
+                		logger::instance()->level(logger::DEBUG) << "last acc. thread=";
                 		if( last_accessing_thread_ )
-                			std::cerr << *last_accessing_thread_ << std::endl;
+                			logger::instance()->level(logger::DEBUG) << *last_accessing_thread_ << std::endl;
                 		else
-                			std::cerr << "null" << std::endl;
-                		std::cerr << "curr. acc. thread=" << e.accessing_thread_ << std::endl;
-#						endif
+                			logger::instance()->level(logger::DEBUG)  << "null" << std::endl;
+                		logger::instance()->level(logger::DEBUG)
+                				<< "curr. acc. thread=" << e.accessing_thread_ << std::endl;
                         last_accessing_thread_ = e.accessing_thread_;
                 }
         };
@@ -112,10 +113,8 @@ namespace shared_var_fsm
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
-#                       if defined( ERASER_DEBUG )
-                        std::cout << "CV: " << fsm.cv_ << std::endl;
-                        std::cout << "locks_held: " << e.accessing_thread_.locks_held_ << std::endl;
-#                       endif                
+                		LOG_INFO( "CV: " << fsm.cv_ );
+                        LOG_INFO( "locks_held: " << e.accessing_thread_.locks_held_ );
                         // update cv & check data races
                         fsm.update_cv( e.accessing_thread_.locks_held_ );
                         if( fsm.cv_empty() && fsm.alarm_ )
@@ -131,9 +130,8 @@ namespace shared_var_fsm
                 template <class EVT,class FSM,class SourceState,class TargetState>
                 void operator()(EVT const& e, FSM&, SourceState& s ,TargetState& t )
                 {
-                        std::cout << "on " << typeid(EVT).name() << ": "
-                        << typeid(SourceState).name() << " --> " << typeid(TargetState).name()
-                        << std::endl;
+                        LOG_ALWAYS( "on " << typeid(EVT).name() << ": "
+                        << typeid(SourceState).name() << " --> " << typeid(TargetState).name() );
                 }
         };
 
@@ -187,7 +185,7 @@ namespace shared_var_fsm
         template <class FSM,class Event>
         void no_transition(Event const& e, FSM&,int state)
         {
-            std::cout << "NO TRANS on " << typeid(Event).name() << " from " << state << std::endl;
+            LOG_INFO( "NO TRANS on " << typeid(Event).name() << " from " << state );
             BOOST_ASSERT_MSG(false, "No transition in fsm");
         }
     };
@@ -227,9 +225,6 @@ namespace shared_var_fsm
     template <class EraserTraits>
     void shared_var<EraserTraits>::read( const thread_t& reader )
     {
-#			if 0 //defined( ERASER_DEBUG )
-    		std::cerr << "reader thread=" << reader << std::endl;
-#			endif
             impl_->process_event( shared_var_fsm::read<EraserTraits>(reader) );
     }
 

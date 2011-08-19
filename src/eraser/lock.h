@@ -7,6 +7,7 @@
 #include <boost/concept_check.hpp>
 
 #include "eraser/agent.h"
+#include "eraser/logger.h"
 
 namespace eraser
 {
@@ -23,7 +24,7 @@ struct lock : boost::operators<lock>
 	bool operator==( const lock& rhs ) const
 	{
 		bool res = agent::instance()->jni()->IsSameObject( lock_id_, rhs.lock_id_ );
-		ERASER_LOG( "lock compare res: " << std::boolalpha << res );
+		LOG_INFO( "lock compare res: " << std::boolalpha << res );
 		return res;
 	}
 };
@@ -37,7 +38,7 @@ inline std::size_t hash_value( const lock& l )
 	err = agent::instance()->jvmti()->GetObjectHashCode( l.lock_id_, &hash_code );
 	check_jvmti_error(agent::instance()->jvmti(), err, "get object hash code");
 	std::size_t res = static_cast<std::size_t>(hash_code);
-	ERASER_LOG( "lock hash=" << res );
+	LOG_INFO( "lock hash=" << res );
 	return res;
 }
 

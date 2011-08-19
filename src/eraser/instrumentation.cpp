@@ -7,6 +7,8 @@
 #include "eraser/instrumentation.h"
 #include "eraser/agent.h"
 #include "eraser/crw_hooks.h"
+#include "eraser/logger.h"
+
 
 #include "sun/agent_util.h"
 #include "sun/java_crw_demo.h"
@@ -135,7 +137,7 @@ void mnr( unsigned ccount, const char** method_names
 						}
                 }
 
-				ERASER_LOG( classname );
+				LOG_INFO( classname );
 
                 // prevent self-instrumentation
                 if( strcmp(classname, PROXY_CLASS) == 0 )

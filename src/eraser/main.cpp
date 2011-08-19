@@ -1,8 +1,10 @@
 
+#include <boost/lexical_cast.hpp>
 
 #include <jvmti.h>
 #include "sun/agent_util.h"
 #include "eraser/agent.h"
+#include "eraser/logger.h"
 #include "eraser/monitor.h"
 #include "eraser/instrumentation.h"
 #include "eraser/vm_hooks.h"
@@ -57,7 +59,7 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
                               , jint* new_class_data_len, unsigned char** new_class_data )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        //ERASER_LOG( eraser::agent::instance()->phase() );
+        LOG_DEBUG( eraser::agent::instance()->phase() );
         eraser::instrument_classfile( jvmti, jni, class_being_redefined, loader, name, protection_domain
                                 , class_data_len, class_data, new_class_data_len, new_class_data );
 }
@@ -65,14 +67,14 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
 void JNICALL vm_thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        ERASER_LOG( "phase=" << eraser::agent::instance()->phase() );
+        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase() );
         eraser::thread_start( jvmti, jni, thread );
 }
 
 void JNICALL vm_thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        ERASER_LOG( "phase=" << eraser::agent::instance()->phase() );
+        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase() );
         eraser::thread_end( jvmti, jni, thread );
 }
 
@@ -128,9 +130,15 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         if (rc != JNI_OK || jvmti == 0)
             fatal_error("ERROR: Unable to create jvmtiEnv, error=%d\n", rc);
         
+        char* log_level_envar = std::getenv("ERASER_LOG_LEVEL");
+        unsigned int log_level = eraser::logger::DEBUG;
+        if( log_level_envar != 0 )
+        	log_level = boost::lexical_cast<unsigned int>( log_level_envar );
+        eraser::logger::instance()->set_curr_level( log_level );
+
         jint version = 0;
         jvmti->GetVersionNumber( &version );
-        ERASER_LOG( "jvmti version= " << version );
+        LOG_INFO( "jvmti version= " << version );
 
 
         eraser::agent::instance()->jvmti_ = jvmti;

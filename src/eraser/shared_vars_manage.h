@@ -45,14 +45,14 @@ struct object_data : boost::noncopyable
 				vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
 		}
 
-		shared_var_t& get_shared_var( fields_key_t field )
+		shared_var_t* get_shared_var( fields_key_t field )
 		{
-			return vars_.at( field );
+			return &vars_.at( field );
 		}
 
-		const shared_var_t& get_shared_var( fields_key_t field ) const
+		const shared_var_t* get_shared_var( fields_key_t field ) const
 		{
-			return vars_.at( field );
+			return &vars_.at( field );
 		}
 };
 
@@ -64,7 +64,7 @@ inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size
 	tag_object( obj, new object_data( field_ids, num_fields, f ));
 }
 
-inline const shared_var_t& get_shared_var( jobject field_object, jfieldID field_id )
+inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 {
 	 try
 	 {
@@ -75,45 +75,9 @@ inline const shared_var_t& get_shared_var( jobject field_object, jfieldID field_
 	 catch( const std::out_of_range& e )
 	 {
 		 std::cerr << "search in object shared vars failed" << std::endl;
-		 throw;
+		 return 0;
 	 }
 }
-
-//// --- set field watch ----
-//inline void setup_field_watches( jclass cls )
-//{
-//	jvmtiError err;
-//
-//	// filter out all classes except for "inc" package
-//	// nested packages are also filtered out
-//	std::string cls_sig = agent::instance()->class_sig( cls );
-//	xpr::sregex inc = xpr::as_xpr("Linc/") >> +xpr::alnum >> ';';
-//	if( !xpr::regex_match( cls_sig, inc ) )
-//		return;
-//	ERASER_LOG( cls_sig );
-//
-//	// get class fields
-//	jint field_count = 0;
-//	jfieldID* fields;
-//	err = agent::instance()->jvmti()->GetClassFields( cls, &field_count, &fields );
-//	if( err != JVMTI_ERROR_NONE)
-//	{
-//		ERASER_LOG( "err=" << err );
-//		return;
-//	}
-//	check_jvmti_error(agent::instance()->jvmti(), err, "get class fields");
-//
-//	// set read & write watches
-//	for( size_t j=0; j<field_count; ++j )
-//	{
-//		err = agent::instance()->jvmti()->SetFieldAccessWatch( cls, fields[j] );
-//		if( err != JVMTI_ERROR_NONE && err != JVMTI_ERROR_DUPLICATE )
-//			check_jvmti_error(agent::instance()->jvmti(), err, "set field access watch");
-//		err = agent::instance()->jvmti()->SetFieldModificationWatch( cls, fields[j] );
-//		if( err != JVMTI_ERROR_NONE && err != JVMTI_ERROR_DUPLICATE )
-//			check_jvmti_error(agent::instance()->jvmti(), err, "set field modification watch");
-//	}
-//}
 
 }
 

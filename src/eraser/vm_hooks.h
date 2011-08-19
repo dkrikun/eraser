@@ -8,7 +8,7 @@
 namespace eraser
 {
 
-const thread_t& get_thread( jthread thread_id );
+thread_t* get_thread( jthread thread_id );
 void thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );
 void thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );
 

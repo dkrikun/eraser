@@ -9,6 +9,7 @@
 #include "eraser/shared_vars_manage.h"
 #include "eraser/thread.h"
 #include "eraser/traits.h"
+#include "eraser/logger.h"
 
 namespace xpr = boost::xpressive;
 
@@ -33,7 +34,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread, jobject o
         xpr::sregex inc = xpr::as_xpr("Linc/") >> +xpr::alnum >> ';';
         if( !xpr::regex_match( cls_sig, inc ) )
         	return;
-        ERASER_LOG( cls_sig );
+        LOG_INFO( cls_sig );
 
         // get fields declared within the class of the object being created
         jint field_count = 0;
@@ -50,7 +51,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread, jobject o
         // field access events, because there is no object!
         for( size_t j=0; j<field_count; ++j )
         {
-        	ERASER_LOG( "field " << j << " " << fields[j] );
+        	LOG_INFO( "field " << j << " " << fields[j] );
         	err = jvmti->SetFieldAccessWatch( cls, fields[j] );
     		// rude, probably better manage duplicates by ourselves
         	if( err != JVMTI_ERROR_NONE && err != JVMTI_ERROR_DUPLICATE )
@@ -67,31 +68,48 @@ void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 
 void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
-		ERASER_LOG( "MONITOR ENTER"
+		LOG_INFO( "MONITOR ENTER"
 				<< " thread= " << thread_id
 				<< " monitor= " << obj );
 
-        thread_t thread = get_thread( thread_id );
+#		if defined ( ERASER_DEBUG )
+		jthread global_refa = agent::instance()->jni()->NewGlobalRef( thread_id );
+		if( global_refa == 0 )
+			fatal_error("Out of memory while trying to create new global ref.");
+        LOG_DEBUG( "SAME? " << std::boolalpha << agent::instance()->same_as_last_thread( thread_id ) );
+        agent::instance()->update_last_thread( global_refa );
+
+//		static jthread last_thread;
+//		bool res = agent::instance()->jni()->IsSameObject( last_thread, thread_id );
+//		ERASER_LOG( "SAME?" << std::boolalpha << res );
+//		last_thread = agent::instance()->jni()->NewGlobalRef(thread_id);
+
+        agent::instance()->dump_thread_debug( thread_id );
+# 	    endif
+
+        static thread_t* last(0);
+        thread_t* thread = get_thread( thread_id );
+        LOG_DEBUG( "SAME SAME??" << std::boolalpha << (last == thread) );
+        last = thread;
         jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         			fatal_error("Out of memory while trying to create new global ref.");
-        ERASER_LOG( "same as last: " << std::boolalpha << agent::instance()->same_as_last_thread( thread_id ) );
-        agent::instance()->update_last_thread( thread_id );
-        thread.lock( lock(global_ref) );
+
+        thread->lock( lock(global_ref) );
 
 }
 void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
-		ERASER_LOG( "MONITOR EXIT"
+		LOG_INFO( "MONITOR EXIT"
 			<< " thread= " << thread_id
 			<< " monitor= " << obj );
 
-		thread_t thread = get_thread( thread_id );
+		thread_t* thread = get_thread( thread_id );
 		// do we really need a global reference here?
 		jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         			fatal_error("Out of memory while trying to create new global ref.");
-		thread.unlock( lock(global_ref) );
+		thread->unlock( lock(global_ref) );
 }
 
 }
