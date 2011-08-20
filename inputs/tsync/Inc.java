@@ -29,11 +29,11 @@ public class Inc
                 //readLine();
 
                 Cell cell = new Cell();
-                Cell cell2 = new Cell();
+       //       Cell cell2 = new Cell();
 
 		cell.data = 1;
 		cell.id = 2;
-                cell.sdata = 3;
+        //      cell.sdata = 3;
 	//      cell.subcell = new SubCell();
 	//      cell.subcell2 = cell.subcell;
 

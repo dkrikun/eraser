@@ -13,6 +13,7 @@ using gcc ;
 lib eraser       
                  : [ glob src/eraser/*.cpp ]
                    [ glob src/sun/*.c ]
+                   /home/daniel/work/tools/boost_1_46_1/stage/lib/libboost_program_options.so
 
                  : <include>src
                    <include>src/sun

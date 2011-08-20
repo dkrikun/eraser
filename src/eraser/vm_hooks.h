@@ -2,13 +2,9 @@
 #ifndef VM_HOOKS
 #define VM_HOOKS
 
-#include "eraser/common.h"
-
-
 namespace eraser
 {
 
-thread_t* get_thread( jthread thread_id );
 void thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );
 void thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread );
 

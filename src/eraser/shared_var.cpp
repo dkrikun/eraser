@@ -113,8 +113,8 @@ namespace shared_var_fsm
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
-                		LOG_INFO( "CV: " << fsm.cv_ );
-                        LOG_INFO( "locks_held: " << e.accessing_thread_.locks_held_ );
+                		LOG_INFO( "CV: " << fsm.cv_, dummy );
+                        LOG_INFO( "locks_held: " << e.accessing_thread_.locks_held_, dummy );
                         // update cv & check data races
                         fsm.update_cv( e.accessing_thread_.locks_held_ );
                         if( fsm.cv_empty() && fsm.alarm_ )
@@ -130,8 +130,8 @@ namespace shared_var_fsm
                 template <class EVT,class FSM,class SourceState,class TargetState>
                 void operator()(EVT const& e, FSM&, SourceState& s ,TargetState& t )
                 {
-                        LOG_ALWAYS( "on " << typeid(EVT).name() << ": "
-                        << typeid(SourceState).name() << " --> " << typeid(TargetState).name() );
+                        LOG_INFO( "on " << typeid(EVT).name() << ": "
+                        << typeid(SourceState).name() << " --> " << typeid(TargetState).name(), dummy );
                 }
         };
 
@@ -147,7 +147,8 @@ namespace shared_var_fsm
                 template <class EVT,class FSM,class SourceState,class TargetState>
                 bool operator()(EVT const& evt ,FSM& fsm,SourceState& from,TargetState& )
                 {
-                    BOOST_ASSERT_MSG( from.last_accessing_thread_, "last_accessing_thread_ is supposed to be init. at this point");
+                    BOOST_ASSERT_MSG( from.last_accessing_thread_
+                    		, "last_accessing_thread_ is supposed to be init. at this point!" );
                     bool res = evt.accessing_thread_ != from.last_accessing_thread_.get();
 #                   if 0 //defined( ERASER_DEBUG )
                     std::cout << "accessing thread= " << evt.accessing_thread_ << std::endl;
@@ -185,7 +186,7 @@ namespace shared_var_fsm
         template <class FSM,class Event>
         void no_transition(Event const& e, FSM&,int state)
         {
-            LOG_INFO( "NO TRANS on " << typeid(Event).name() << " from " << state );
+            LOG_INFO( "NO TRANS on " << typeid(Event).name() << " from " << state, dummy );
             BOOST_ASSERT_MSG(false, "No transition in fsm");
         }
     };

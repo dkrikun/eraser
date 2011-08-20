@@ -5,6 +5,7 @@
 
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/unordered_map.hpp>
+#include <map>
 #include <boost/bind.hpp>
 
 #include "eraser/agent.h"
@@ -34,8 +35,8 @@ inline void alarm( jclass cls, jvmti_traits::field_id_t field_id, const thread_t
 struct object_data : boost::noncopyable
 {
 		typedef jvmti_traits::field_id_t                     fields_key_t;
-
-		boost::unordered_map< fields_key_t, shared_var_t > vars_;
+		typedef std::map< fields_key_t, shared_var_t >		 map_t;
+		map_t vars_;
 
 		object_data( fields_key_t* fields
 				, size_t num_fields
@@ -47,12 +48,8 @@ struct object_data : boost::noncopyable
 
 		shared_var_t* get_shared_var( fields_key_t field )
 		{
-			return &vars_.at( field );
-		}
-
-		const shared_var_t* get_shared_var( fields_key_t field ) const
-		{
-			return &vars_.at( field );
+			map_t::iterator it = vars_.find( field );
+			return ( it == vars_.end() )? 0 : &vars_.at(field);
 		}
 };
 
@@ -66,17 +63,11 @@ inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size
 
 inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 {
-	 try
-	 {
-		 object_data* od = get_tag<object_data>(field_object);
-		 BOOST_ASSERT( od != 0 );
-		 return od->get_shared_var( field_id );
-	 }
-	 catch( const std::out_of_range& e )
-	 {
-		 std::cerr << "search in object shared vars failed" << std::endl;
-		 return 0;
-	 }
+	object_data* od = get_tag<object_data>(field_object);
+	BOOST_ASSERT( od != 0 );
+	shared_var_t* res =  od->get_shared_var( field_id );
+	BOOST_ASSERT_MSG( res, "FAILED search in shared_vars" );
+	return res;
 }
 
 }

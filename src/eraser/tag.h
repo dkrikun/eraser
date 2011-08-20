@@ -3,11 +3,12 @@
 
 #include <jvmti.h>
 #include "eraser/agent.h"
+#include "sun/agent_util.h"
 
 namespace eraser
 {
 
-// faciliate arbitrate date attachment to jobject
+// Facilitate arbitrate date attachment to jobject
 template<class Data>
 void tag_object( jobject obj, Data* data )
 {

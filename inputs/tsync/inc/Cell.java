@@ -5,11 +5,11 @@ public class Cell
 {
         public int data;
         public int id;
-        public static int sdata;
+     // public static int sdata;
      // public SubCell subcell = new SubCell();
      // public SubCell subcell2;
-        public Object W = new Object();
-        public Object E = new Object();
+     // public Object W = new Object();
+     // public Object E = new Object();
 
         public void go()
         {
@@ -23,17 +23,17 @@ public class Cell
      //                 int y = 5;
      //         }
 
-                synchronized(W)
-                {
-                        synchronized(E)
-                        {
-                                synchronized(E)
-                                {
-                                        int t = 6;
-                                }
-                                int v = this.id;
-                        }
-                }
+     //         synchronized(W)
+     //         {
+     //                 synchronized(E)
+     //                 {
+     //                         synchronized(E)
+     //                         {
+     //                                 int t = 6;
+     //                         }
+     //                         int v = this.id;
+     //                 }
+     //         }
         }
 }
 

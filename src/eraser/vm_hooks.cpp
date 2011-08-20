@@ -5,55 +5,63 @@
 #include "eraser/common.h"
 #include "eraser/shared_vars_manage.h"
 #include "eraser/logger.h"
+#include "eraser/threads_manage.h"
+
 
 
 namespace eraser
 {
 
-// auxillary
-thread_t* get_thread( jthread thread_id )
-{
-		thread_t* od = get_tag<thread_t>( thread_id );
-		BOOST_ASSERT( od != 0 );
-        BOOST_ASSERT( agent::instance()->jni()->IsSameObject( od->thread_id_, thread_id ));
-		return od;
-}
-
 // following are invoked from within vm event callbacks
 void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
                 , jthread thread_id )
 {
-		jvmtiError err;
-
-		// debug, quick and dirty workaround for unclear sigsegv
-		jvmtiThreadInfo ti;
-		memset( &ti, 0, sizeof(ti) );
-		err = agent::instance()->jvmti()->GetThreadInfo( thread_id, &ti );
-		check_jvmti_error( agent::instance()->jvmti(), err, "get thread info" );
-		if( strcmp( ti.name, "DestroyJavaVM") == 0 || agent::instance()->met_destroy_jvm_thread_ )
+		// workaround, no new threads after 'DestroyJavaVM' are allowed
+		if(( agent::instance()->thread_name( thread_id ) == "DestroyJavaVM")
+				|| agent::instance()->met_destroy_jvm_thread_ )
 		{
 			agent::instance()->met_destroy_jvm_thread_ = true;
+			agent::instance()->death_active_ = true;
 			return;
 		}
 
+		std::string thread_name = agent::instance()->thread_name( thread_id );
+		logger::instance()->add_log_file( thread_name, thread_name );
+
+		LOG_INFO( "THREAD START"
+				<< " thread= " << thread_id
+				<< " thread_name= " << thread_name
+				, thread_name );
+
+
 		jthread global_ref = agent::instance()->jni()->NewWeakGlobalRef( thread_id );
-		LOG_DEBUG( "global_ref=" << global_ref );
+		LOG_DEBUG( "global_ref=" << global_ref, dummy );
 		if( global_ref == 0 )
 			fatal_error("Out of memory while trying to create new global ref.");
-		tag_object( thread_id, new thread_t( global_ref ) );
+		thread_t* thread = new thread_t( global_ref );
+		LOG_INFO( "thread_t= " << thread, thread_name );
+
+		tag_object( thread_id, thread );
+		agent::instance()->dump_threads( thread_id );
 }
 
 void thread_end( jvmtiEnv *jvmti, JNIEnv *jni
                 , jthread thread_id )
 {
-		//ERASER_LOG( "thread_id=" << thread_id );
-		thread_t* od = get_tag<thread_t>( thread_id );
-		if( od == 0 )
+		std::string thread_name = agent::instance()->thread_name( thread_id );
+		LOG_INFO( "THREAD END"
+			<< " thread= " << thread_id
+			<< " thread_name= " << thread_name
+			, thread_name );
+
+		thread_t* thread = get_thread( thread_id, "TE"+thread_name );
+		if( thread == 0 )
 			return;
+
+		LOG_INFO( "thread_t= " << thread, thread_name );
+		agent::instance()->dump_threads( thread_id );
 		clear_tag( thread_id );
-		LOG_DEBUG( "global_ref=" << od->thread_id_ );
-		//agent::instance()->jni()->DeleteGlobalRef( od->thread_id_ );
-		delete od;
+		delete thread;
 }
 
 void field_read( jvmtiEnv* jvmti, JNIEnv* jni
@@ -61,17 +69,23 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
                   , jlocation location, jclass field_klass
                   , jobject object, jfieldID field )
 {
-		LOG_INFO( "READ");
-    	LOG_INFO( "class= " << agent::instance()->class_sig( field_klass ) << " field= " << field );
+		std::string thread_name = agent::instance()->thread_name( thread_id );
+		LOG_INFO( "READ"
+				<< " class= " << agent::instance()->class_sig( field_klass )
+				<< " field= " << field
+				, thread_name );
 
     	if( object == 0 )
     		return;
 
-        thread_t* thread 		 = get_thread( thread_id );
+        thread_t* thread 		 = get_thread( thread_id, "FR "+thread_name );
         shared_var_t* shared_var = get_shared_var( object, field );
 
-        LOG_INFO( "thread_t= " << *thread );
+        LOG_INFO( "thread_t= " << *thread
+        		<< " thread name= " << thread_name
+        		, thread_name );
 
+        agent::instance()->dump_threads( thread_id );
         shared_var->read( *thread );
 }
 
@@ -81,16 +95,23 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
                    , jobject object, jfieldID field
                    , char signature_type, jvalue new_value )
 {
-		LOG_INFO( "WRITE");
-		LOG_INFO( "class= " << agent::instance()->class_sig( field_klass ) << " field= " << field );
+		std::string thread_name = agent::instance()->thread_name( thread_id );
+		LOG_INFO( "WRITE"
+			<< " class= " << agent::instance()->class_sig( field_klass )
+			<< " field= " << field
+			, thread_name );
 
-        if( object == 0)
+        if( object == 0 )
         	return;
 
-        thread_t* thread         = get_thread( thread_id );
+        thread_t* thread         = get_thread( thread_id, "FW "+thread_name );
         shared_var_t* shared_var = get_shared_var( object, field );
 
-        LOG_INFO( "thread_t= " << *thread );
+        LOG_INFO( "thread_t= " << *thread
+        		<< " thread name= " << thread_name
+        		, thread_name );
+
+        agent::instance()->dump_threads( thread_id );
         shared_var->write( *thread );
 }
 

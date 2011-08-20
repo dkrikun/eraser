@@ -1,5 +1,7 @@
 
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
+#include <boost/xpressive/xpressive.hpp>
 
 #include <jvmti.h>
 #include "sun/agent_util.h"
@@ -10,15 +12,13 @@
 #include "eraser/vm_hooks.h"
 
 
+namespace po = boost::program_options;
+namespace xpr = boost::xpressive;
+
 // -------- Event callbacks -----------
 # define ENABLE_EVENT_NOTIFICATION(event)\
         err = jvmti->SetEventNotificationMode( JVMTI_ENABLE, event, 0 );        \
         check_jvmti_error(jvmti, err, "set event notifications");
-
-# define LOCK_AND_EXIT_ON_DEATH()\
-        eraser::scoped_lock( jvmti, eraser::agent::instance()->monitor_ );      \
-        if(eraser::agent::instance()->death_active_)                            \
-                return;
 
 
 void JNICALL vm_start( jvmtiEnv *jvmti, JNIEnv *jni )
@@ -59,7 +59,7 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
                               , jint* new_class_data_len, unsigned char** new_class_data )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        LOG_DEBUG( eraser::agent::instance()->phase() );
+        LOG_DEBUG( eraser::agent::instance()->phase(), dummy );
         eraser::instrument_classfile( jvmti, jni, class_being_redefined, loader, name, protection_domain
                                 , class_data_len, class_data, new_class_data_len, new_class_data );
 }
@@ -67,14 +67,14 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
 void JNICALL vm_thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase() );
+        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase(), dummy );
         eraser::thread_start( jvmti, jni, thread );
 }
 
 void JNICALL vm_thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase() );
+        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase(), dummy );
         eraser::thread_end( jvmti, jni, thread );
 }
 
@@ -115,6 +115,7 @@ void JNICALL vm_death( jvmtiEnv *jvmti, JNIEnv *jni )
         check_jvmti_error(jvmti, err, "Cannot set jvmti callbacks");
 }
 
+
 // -------- OnLoad -----------
 
 JNIEXPORT jint JNICALL
@@ -129,16 +130,17 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         rc = vm->GetEnv( (void **)&jvmti, JVMTI_VERSION);
         if (rc != JNI_OK || jvmti == 0)
             fatal_error("ERROR: Unable to create jvmtiEnv, error=%d\n", rc);
-        
+#		if 0
         char* log_level_envar = std::getenv("ERASER_LOG_LEVEL");
         unsigned int log_level = eraser::logger::DEBUG;
         if( log_level_envar != 0 )
         	log_level = boost::lexical_cast<unsigned int>( log_level_envar );
         eraser::logger::instance()->set_curr_level( log_level );
+#		endif
 
         jint version = 0;
         jvmti->GetVersionNumber( &version );
-        LOG_INFO( "jvmti version= " << version );
+        LOG_INFO( "jvmti version= " << std::hex << version << std::dec, dummy );
 
 
         eraser::agent::instance()->jvmti_ = jvmti;
@@ -149,21 +151,62 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         
         if( options != 0 )
         {
-        	eraser::agent::instance()->config( options );
+        	po::options_description desc("Allowed options");
+
+        	unsigned int default_log_level = eraser::logger::ALWAYS;
+        	desc.add_options()
+        	    ("help", "produce help message")
+        	    ("log-level", po::value<unsigned int>()->default_value( default_log_level ), "log level" )
+#				if defined( ERASER_DEBUG )
+        	    ("filter", po::value<std::string>()->default_value("inc(\\w+|\\.)*\\w+")
+        	    		, "regex to match classes for instrumentation")
+#				else
+				("filter", po::value<std::string>()->default_value("\\w+(\\w+|\\.)*\\w+")
+						, "regex to match classes for instrumentation")
+#				endif
+        	;
+
+        	po::variables_map vm;
+        	std::vector<std::string> split_args = po::split_unix( options, "," );
+#			if defined( ERASER_DEBUG )
+        	std::cout << "Parsed args:\n\t";
+        	std::copy( split_args.begin(), split_args.end(), std::ostream_iterator<std::string>(std::cerr," "));
+        	std::cerr << std::endl;
+#			endif
+        	po::store( po::command_line_parser(split_args).options(desc).run(), vm );
+        	po::notify( vm );
+
+        	if( vm.count("help") )
+        	{
+        		std::cout << desc << std::endl;
+        		return 0;
+        	}
+
+        	// replace dots for slashes
+        	// i.e. java.lang.Object --> java/lang/Object
+    		xpr::sregex dot = xpr::as_xpr("\\.");
+    		std::string slash = "/";
+    		std::string inst_filter = xpr::regex_replace( vm["filter"].as<std::string>(), dot, slash );
+
+        	eraser::agent::instance()->filter_regex_ = inst_filter;
+        	eraser::logger::instance()->set_curr_level( vm["log-level"].as<unsigned int>() );
         }
+        LOG_INFO( "regex_filter= " << eraser::agent::instance()->filter_regex_, dummy );
+        LOG_INFO( "log level= " << eraser::logger::instance()->curr_level(), dummy );
+
 
         // set capabilities
         jvmtiCapabilities   capabilities;
         memset(&capabilities, 0, sizeof(capabilities));
-        capabilities.       can_tag_objects                                = 1;
-        capabilities.       can_generate_garbage_collection_events         = 1;
-        capabilities.       can_generate_all_class_hook_events             = 1;
-        capabilities.       can_generate_object_free_events                = 1;
-        capabilities.       can_get_source_file_name                       = 1;
-        capabilities.       can_get_line_numbers                           = 1;
-        capabilities.       can_generate_vm_object_alloc_events            = 1;
-        capabilities.       can_generate_field_access_events               = 1;
-        capabilities.       can_generate_field_modification_events         = 1;
+        capabilities.       can_tag_objects                                = JNI_TRUE;
+        capabilities.       can_generate_garbage_collection_events         = JNI_TRUE;
+        capabilities.       can_generate_all_class_hook_events             = JNI_TRUE;
+        capabilities.       can_generate_object_free_events                = JNI_TRUE;
+        capabilities.       can_get_source_file_name                       = JNI_TRUE;
+        capabilities.       can_get_line_numbers                           = JNI_TRUE;
+        capabilities.       can_generate_vm_object_alloc_events            = JNI_TRUE;
+        capabilities.       can_generate_field_access_events               = JNI_TRUE;
+        capabilities.       can_generate_field_modification_events         = JNI_TRUE;
         err = jvmti->AddCapabilities(&capabilities);
         check_jvmti_error(jvmti, err, "add capabilities");
         

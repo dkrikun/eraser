@@ -19,7 +19,6 @@ struct universal_set : boost::operators< universal_set<T> >
 {
         BOOST_CONCEPT_ASSERT((boost::Assignable<T>));
         BOOST_CONCEPT_ASSERT((boost::EqualityComparable<T>));
-        //BOOST_CONCEPT_ASSERT((boost::AdaptableBinaryPredicate<Compare>)); // not working
 
         private:
         typedef typename std::list<T>			      container_t;

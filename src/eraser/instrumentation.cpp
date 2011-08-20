@@ -19,7 +19,7 @@ namespace xpr = boost::xpressive;
 namespace eraser
 {
 
-// debugging, ignore
+# if 0
 void mnr( unsigned ccount, const char** method_names
 		, const char** method_signatures, int method_count )
 {
@@ -30,6 +30,7 @@ void mnr( unsigned ccount, const char** method_names
 		std::cerr << "\n" << method_signatures[j];
 	std::cerr << std::endl;
 }
+# endif
 
 #       define PROXY_CLASS               "Proxy"
 #       define ENGAGED_FIELD             "engaged"
@@ -124,20 +125,22 @@ void mnr( unsigned ccount, const char** method_names
                 // determine classname
                 const char* classname = get_classname( name, class_data, class_data_len );
 
-                // for debug, inst. only java.lang.Object for now
-                if( strcmp(classname, "java/lang/Object") != 0 )
+#				if 0
+                // debugging, filter out all classes except for package "inc"
+                // nested packages are also filtered out here
+                xpr::cregex filter = xpr::as_xpr("inc/") >> +xpr::alnum;
+#				endif
+
+                xpr::cregex filter = xpr::cregex::compile( eraser::agent::instance()->filter_regex_
+                		+ std::string("|java/lang/Object"));
+
+                if( !xpr::regex_match( classname, filter ) )
                 {
-						// debugging, filter out all classes except for package "inc"
-						// nested packages are also filtered out here
-						xpr::cregex inc = xpr::as_xpr("inc/") >> +xpr::alnum;
-						if( !xpr::regex_match( classname, inc ) )
-						{
-							free((void*)classname);
-							return;
-						}
+                	free((void*)classname);
+                	return;
                 }
 
-				LOG_INFO( classname );
+				LOG_INFO( classname, dummy );
 
                 // prevent self-instrumentation
                 if( strcmp(classname, PROXY_CLASS) == 0 )
@@ -145,8 +148,6 @@ void mnr( unsigned ccount, const char** method_names
                         free((void*)classname);
                         return;
                 }
-
-                std::cerr << "in instrument_classfile " << classname << std::endl;
                 
                 unsigned char* new_image = 0;
                 long new_length = 0;
@@ -171,18 +172,14 @@ void mnr( unsigned ccount, const char** method_names
                     	     , &new_length
                              , 0, 0 );
                 
-                std::string class_dump_name( classname );
-                class_dump_name += "_dump.class";
-
-
-                
                 // memcpy transformed classfile to jvmti allocated memory
                 if( new_length > 0 )
                 {
-                    //std::ofstream class_dump( class_dump_name.c_str() );
+#					if defined( ERASER_DEBUG )
                 	std::ofstream class_dump( "dump", std::ofstream::binary );
                     class_dump.write( (const char*)new_image, (std::streamsize)new_length );
                     class_dump.close();
+#					endif
 
                     unsigned char *jvmtispace = (unsigned char *)allocate( jvmti, (jint)new_length );
                     memcpy( (void*)jvmtispace, (void*)new_image, new_length );
