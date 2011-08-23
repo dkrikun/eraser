@@ -140,15 +140,14 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
 
         jint version = 0;
         jvmti->GetVersionNumber( &version );
-        LOG_INFO( "jvmti version= " << std::hex << version << std::dec, dummy );
-
 
         eraser::agent::instance()->jvmti_ = jvmti;
+
           
         // init agent lock
         err = jvmti->CreateRawMonitor("agent lock", &(eraser::agent::instance()->monitor_));
         check_jvmti_error(jvmti, err, "create raw monitor");
-        
+        LOG_INFO( "jvmti version= " << std::hex << version << std::dec, dummy );
         if( options != 0 )
         {
         	po::options_description desc("Allowed options");

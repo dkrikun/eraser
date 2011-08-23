@@ -26,7 +26,7 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 		}
 
 		std::string thread_name = agent::instance()->thread_name( thread_id );
-		logger::instance()->add_log_file( thread_name, thread_name );
+		//logger::instance()->add_log_file( thread_name, thread_name );
 
 		LOG_INFO( "THREAD START"
 				<< " thread= " << thread_id
@@ -42,7 +42,10 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 		LOG_INFO( "thread_t= " << thread, thread_name );
 
 		tag_object( thread_id, thread );
-		agent::instance()->dump_threads( thread_id );
+		thread_t* thread2 = get_thread(thread_id);
+		LOG_INFO("A FUNNY LOG", "");
+
+		//agent::instance()->dump_threads( thread_id );
 }
 
 void thread_end( jvmtiEnv *jvmti, JNIEnv *jni

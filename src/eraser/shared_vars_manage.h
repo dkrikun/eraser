@@ -5,6 +5,7 @@
 
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/unordered_map.hpp>
+#include "classfile_constants.h"
 #include <map>
 #include <boost/bind.hpp>
 
@@ -39,17 +40,21 @@ struct object_data : boost::noncopyable
 		map_t vars_;
 
 		object_data( fields_key_t* fields
-				, size_t num_fields
+				, size_t num_fields, jclass cls
 				, shared_var_t::alarm_func_t alarm_func )
 		{
-			for( size_t j=0; j<num_fields; ++j )
+			jint ret;
+			for( size_t j=0; j<num_fields; ++j ) {
+				agent::instance()->jvmti()->GetFieldModifiers(cls, fields[j], &ret);
+				if (ret & JVM_ACC_STATIC) { printf("asjkdhajkhdasjhdasd===========-----&&&^#^\n"); continue; }
 				vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
+			}
 		}
 
 		shared_var_t* get_shared_var( fields_key_t field )
 		{
 			map_t::iterator it = vars_.find( field );
-			return ( it == vars_.end() )? 0 : &vars_.at(field);
+			return ( it == vars_.end() ) ? 0 : &(it->second);
 		}
 };
 
@@ -58,7 +63,7 @@ struct object_data : boost::noncopyable
 inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size_t num_fields )
 {
 	shared_var_t::alarm_func_t f = boost::bind( &eraser::alarm, cls, _1, _2 );
-	tag_object( obj, new object_data( field_ids, num_fields, f ));
+	tag_object( obj, new object_data( field_ids, num_fields, cls, f ));
 }
 
 inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )

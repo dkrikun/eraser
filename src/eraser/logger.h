@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include "eraser/monitor.h"
 
 
 namespace eraser
@@ -88,11 +89,15 @@ struct logger : boost::noncopyable
 };
 
 #define LOG_ERASER( msg, log_level )\
+		do { 														\
+		eraser::scoped_lock( eraser::agent::instance()->jvmti(),	\
+				eraser::agent::instance()->monitor_ );				\
 		eraser::logger::instance()->level( log_level )				\
 				<< "[" << log_level <<  "|" << __FILE__ << "|"		\
 				<<  __LINE__ << "|" << __FUNCTION__ << "] "			\
 				<< msg												\
-				<< std::endl;
+				<< std::endl;										\
+		} while (0);
 
 #define LOG_ALWAYS( msg, id ) LOG_ERASER( msg, eraser::logger::ALWAYS );
 #define LOG_INFO( msg, id ) LOG_ERASER( msg, eraser::logger::INFO );
