@@ -1,6 +1,6 @@
 #! /bin/bash
 
-$BOOST_ROOT/bjam eraser_inst
+$BOOST_ROOT/bjam eraser_inst variant=debug
 javac src/eraser/Proxy.java -d bin
 classpath=$eraser/inputs/inc
 class=Inc

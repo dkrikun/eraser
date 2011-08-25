@@ -5,9 +5,9 @@
 
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/unordered_map.hpp>
-#include "classfile_constants.h"
 #include <map>
 #include <boost/bind.hpp>
+#include <classfile_constants.h>
 
 #include "eraser/agent.h"
 #include "eraser/common.h"
@@ -36,7 +36,8 @@ inline void alarm( jclass cls, jvmti_traits::field_id_t field_id, const thread_t
 struct object_data : boost::noncopyable
 {
 		typedef jvmti_traits::field_id_t                     fields_key_t;
-		typedef std::map< fields_key_t, shared_var_t >		 map_t;
+		//typedef std::map< fields_key_t, shared_var_t >		 map_t;
+		typedef std::vector<shared_var_t>					 map_t;
 		map_t vars_;
 
 		object_data( fields_key_t* fields
@@ -44,17 +45,22 @@ struct object_data : boost::noncopyable
 				, shared_var_t::alarm_func_t alarm_func )
 		{
 			jint ret;
-			for( size_t j=0; j<num_fields; ++j ) {
+			for( size_t j=0; j<num_fields; ++j )
+			{
 				agent::instance()->jvmti()->GetFieldModifiers(cls, fields[j], &ret);
-				if (ret & JVM_ACC_STATIC) { printf("asjkdhajkhdasjhdasd===========-----&&&^#^\n"); continue; }
-				vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
+				if (ret & JVM_ACC_STATIC)
+					continue;
+				//vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
+				vars_.push_back( shared_var_t( fields[j], alarm_func ) );
 			}
 		}
 
 		shared_var_t* get_shared_var( fields_key_t field )
 		{
-			map_t::iterator it = vars_.find( field );
-			return ( it == vars_.end() ) ? 0 : &(it->second);
+			for( map_t::iterator it = vars_.begin(); it != vars_.end(); ++ it )
+				if( it->field_id_ == field )
+					return &*it;
+			return 0;
 		}
 };
 

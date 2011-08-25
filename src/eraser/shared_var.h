@@ -31,6 +31,11 @@ namespace eraser
                 {
                         return field_id_;
                 }
+
+                bool operator==( const shared_var& rhs ) const
+				{
+                	return field_id_ == rhs.field_id_;
+				}
         };
 
         template <class EraserTraits>
