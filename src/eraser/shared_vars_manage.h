@@ -37,7 +37,7 @@ struct object_data : boost::noncopyable
 {
 		typedef jvmti_traits::field_id_t                     fields_key_t;
 		//typedef std::map< fields_key_t, shared_var_t >		 map_t;
-		typedef std::vector<shared_var_t>					 map_t;
+		typedef std::vector<shared_var_t*>					 map_t;
 		map_t vars_;
 
 		object_data( fields_key_t* fields
@@ -47,19 +47,20 @@ struct object_data : boost::noncopyable
 			jint ret;
 			for( size_t j=0; j<num_fields; ++j )
 			{
+				// skip static fields
 				agent::instance()->jvmti()->GetFieldModifiers(cls, fields[j], &ret);
 				if (ret & JVM_ACC_STATIC)
 					continue;
 				//vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
-				vars_.push_back( shared_var_t( fields[j], alarm_func ) );
+				vars_.push_back( new shared_var_t( fields[j], alarm_func ) );
 			}
 		}
 
 		shared_var_t* get_shared_var( fields_key_t field )
 		{
-			for( map_t::iterator it = vars_.begin(); it != vars_.end(); ++ it )
-				if( it->field_id_ == field )
-					return &*it;
+			for( size_t j=0; j<vars_.size(); ++j )
+				if( vars_[j]->field_id_	== field )
+					return vars_[j];
 			return 0;
 		}
 };
