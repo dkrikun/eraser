@@ -77,7 +77,11 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
 
 	thread_t* thread = get_thread( thread_id );
 	BOOST_ASSERT( thread != 0 );
-	shared_var_t* shared_var = get_shared_var( object, field );
+//	shared_var_t* shared_var = get_shared_var( object, field );
+//	BOOST_ASSERT( shared_var != 0 );
+	debug_obj_data* x = get_tag<debug_obj_data>( object );
+	BOOST_ASSERT( jni->IsSameObject( x->obj_, object ) == JNI_TRUE );
+	shared_var_t* shared_var = x->shared_var_;
 	BOOST_ASSERT( shared_var != 0 );
 
 	logger::instance()->level(1)
@@ -105,9 +109,13 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
 		return;
 
 	thread_t* thread = get_thread( thread_id );
-	BOOST_ASSERT( thread != 0 );
-	shared_var_t* shared_var = get_shared_var( object, field );
-	BOOST_ASSERT( shared_var != 0 );
+		BOOST_ASSERT( thread != 0 );
+	//	shared_var_t* shared_var = get_shared_var( object, field );
+	//	BOOST_ASSERT( shared_var != 0 );
+		debug_obj_data* x = get_tag<debug_obj_data>( object );
+		BOOST_ASSERT( jni->IsSameObject( x->obj_, object ) == JNI_TRUE );
+		shared_var_t* shared_var = x->shared_var_;
+		BOOST_ASSERT( shared_var != 0 );
 
 	logger::instance()->level(1)
 					<< "\t" << "thread_t= " << thread << " " << *thread

@@ -31,6 +31,14 @@ inline void alarm( int cls, jvmti_traits::field_id_t field_id, const thread_t& t
 		;
 }
 
+
+struct debug_obj_data
+{
+	jobject obj_;
+	jfieldID field_id_;
+	shared_var_t* shared_var_;
+};
+
 // keeps shared var logic for each field
 // only fields declared in the object class, not inherited ones
 struct object_data : boost::noncopyable

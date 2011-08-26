@@ -21,6 +21,7 @@ namespace xpr = boost::xpressive;
 namespace eraser
 {
 
+
 // hooks on object creation
 void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobject obj )
 {
@@ -64,11 +65,15 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         //BOOST_ASSERT( global_ref != 0 );
 
         BOOST_ASSERT_MSG( field_count<=2 , "OOPS, to small array" );
-        shared_var_t** data = new shared_var_t*[2];
-        for( size_t j=0; j<field_count; ++j)
-        	data[j] = new shared_var_t( fields[j] );
+//        shared_var_t** data = new shared_var_t*[2];
+//        for( size_t j=0; j<field_count; ++j)
+//        	data[j] = new shared_var_t( fields[j] );
 
-    	tag_object( obj, data );
+        debug_obj_data* x = new debug_obj_data;
+        x->field_id_ = fields[0];
+        x->obj_ = jni->NewGlobalRef(obj);
+        x->shared_var_ = new shared_var_t( fields[0] );
+    	tag_object( obj, x );
 
         // set up read/write access watches
         // this also includes static variables (duplicated over all instances)
