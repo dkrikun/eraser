@@ -35,37 +35,33 @@ std::vector<jthread> agent::all_threads() const
 	return std::vector<jthread>(threads,threads+threads_count);
 }
 
+
 void agent::dump_threads() const
 {
-	LOG_INFO( " ALL THREADS DUMP ", dummy );
+	logger::instance()->level(1) << " ALL THREADS DUMP \n";
 	std::vector<jthread> threads = all_threads();
 	for( size_t j=0; j<threads.size(); ++j )
 	{
 		jthread& curr = threads[j];
-		LOG_INFO( j
-				<< "\n\t" << "thread= " << curr
-				<< "\n\t" << "thread name= " << thread_name( curr )
-				<< "\n\t" << "thread_t= " << get_thread( curr, "DUMP__" )
-				, dummy
-		);
+		logger::instance()->level(1)
+							<< "\t" << "jthread=" << curr << "\n"
+							<< "\t" << "thread name= " << thread_name( curr )
+							<< std::endl;
 	}
 }
 
 void agent::dump_threads( jthread to_compare ) const
 {
 	std::string name = thread_name(to_compare);
-	LOG_INFO( " ALL THREADS DUMP ", name );
+	logger::instance()->level(1) << " ALL THREADS DUMP compared to " << name;
 	std::vector<jthread> threads = all_threads();
 	for( size_t j=0; j<threads.size(); ++j )
 	{
 		jthread& curr = threads[j];
-		LOG_INFO( j
-				<< "\n\t" << "thread= " << curr
+		logger::instance()->level(1)
 				<< "\n\t" << "thread name= " << thread_name( curr )
-				<< "\n\t" << "thread_t= " << get_thread( curr, "DUMP"+name )
-				<< "\n\t" << "is_same_arg?=" << std::boolalpha << ( jni()->IsSameObject( curr, to_compare ) == JNI_TRUE )
-				, name
-		);
+				<< "\t" << std::boolalpha << ( jni()->IsSameObject( curr, to_compare ) == JNI_TRUE )
+				<< std::endl;
 	}
 }
 

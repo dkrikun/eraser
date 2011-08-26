@@ -75,11 +75,17 @@ inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size
 
 inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 {
-	object_data* od = get_tag<object_data>(field_object);
+	shared_var_t** od = get_tag<shared_var_t*>(field_object);
 	BOOST_ASSERT( od != 0 );
-	shared_var_t* res =  od->get_shared_var( field_id );
-	BOOST_ASSERT_MSG( res, "FAILED search in shared_vars" );
-	return res;
+	//shared_var_t* res =  od->get_shared_var( field_id );
+	BOOST_ASSERT( od[0] && od[1] );
+	if( od[0]->field_id_ == field_id )
+		return od[0];
+	else if( od[1]->field_id_ == field_id )
+		return od[1];
+	else
+		BOOST_ASSERT_MSG( false, "FAILED search in shared_vars" );
+	return 0;
 }
 
 }

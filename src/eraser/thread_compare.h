@@ -29,7 +29,7 @@ struct thread_compare <jvmti_traits::thread_id_t>
 	static bool is_equal( const thread_id_t& lhs, const thread_id_t& rhs )
 	{
 		bool res = ( agent::instance()->jni()->IsSameObject( lhs, rhs ) == JNI_TRUE );
-		LOG_INFO("thread compare res: " << std::boolalpha << res, dummy );
+		logger::instance()->level(0) << "thread compare res: " << std::boolalpha << res << std::endl;
 		return res;
 
 	}

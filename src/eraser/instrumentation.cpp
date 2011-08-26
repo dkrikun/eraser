@@ -140,7 +140,7 @@ void mnr( unsigned ccount, const char** method_names
                 	return;
                 }
 
-				LOG_INFO( classname, dummy );
+                logger::instance()->level(1) << classname << std::endl;
 
                 // prevent self-instrumentation
                 if( strcmp(classname, PROXY_CLASS) == 0 )

@@ -87,12 +87,12 @@ namespace shared_var_fsm
                 void on_entry(Event const& e, FSM& fsm)
                 {
 
-                		logger::instance()->level(logger::DEBUG) << "last acc. thread=";
+                		logger::instance()->level(0) << "last acc. thread=";
                 		if( last_accessing_thread_ )
-                			logger::instance()->level(logger::DEBUG) << *last_accessing_thread_ << std::endl;
+                			logger::instance()->level(0) << *last_accessing_thread_ << std::endl;
                 		else
-                			logger::instance()->level(logger::DEBUG)  << "null" << std::endl;
-                		logger::instance()->level(logger::DEBUG)
+                			logger::instance()->level(0)  << "null" << std::endl;
+                		logger::instance()->level(0)
                 				<< "curr. acc. thread=" << e.accessing_thread_ << std::endl;
                         last_accessing_thread_ = e.accessing_thread_;
                 }
@@ -113,8 +113,8 @@ namespace shared_var_fsm
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
-                		LOG_INFO( "CV: " << fsm.cv_, dummy );
-                        LOG_INFO( "locks_held: " << e.accessing_thread_.locks_held_, dummy );
+                		eraser::logger::instance()->level(1) << "CV: " << fsm.cv_ << std::endl;
+                		eraser::logger::instance()->level(1) << "locks_held: " << e.accessing_thread_.locks_held_ << std::endl;
                         // update cv & check data races
                         fsm.update_cv( e.accessing_thread_.locks_held_ );
                         if( fsm.cv_empty() && fsm.alarm_ )
@@ -130,8 +130,8 @@ namespace shared_var_fsm
                 template <class EVT,class FSM,class SourceState,class TargetState>
                 void operator()(EVT const& e, FSM&, SourceState& s ,TargetState& t )
                 {
-                        LOG_INFO( "on " << typeid(EVT).name() << ": "
-                        << typeid(SourceState).name() << " --> " << typeid(TargetState).name(), dummy );
+                	eraser::logger::instance()->level(2) << "on " << typeid(EVT).name() << ": "
+                        << typeid(SourceState).name() << " --> " << typeid(TargetState).name() << std::endl;
                 }
         };
 
@@ -186,7 +186,8 @@ namespace shared_var_fsm
         template <class FSM,class Event>
         void no_transition(Event const& e, FSM&,int state)
         {
-            LOG_INFO( "NO TRANS on " << typeid(Event).name() << " from " << state, dummy );
+        	eraser::logger::instance()->level(2) << "NO TRANS on "
+        			<< typeid(Event).name() << " from " << state << std::endl;
             BOOST_ASSERT_MSG(false, "No transition in fsm");
         }
     };

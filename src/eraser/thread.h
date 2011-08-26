@@ -16,27 +16,28 @@ namespace eraser
                 typedef typename EraserTraits::thread_id_t        thread_id_t;
                 typedef typename EraserTraits::lock_id_t          lock_id_t;
 
-                thread( thread_id_t thread_id )
+                thread( thread_id_t thread_id, std::string name )
                         : thread_id_(thread_id)
+                		, name_(name)
                 {}
 
                 // using default copy-ctor & assignment
 
                 thread_id_t                thread_id_;
+                std::string				   name_;
                 thread_set< lock_id_t >    locks_held_;
-                thread_set< lock_id_t >    write_locks_held_;
 
                 void lock( lock_id_t lock )
                 {
                         locks_held_.insert( lock );
-                        LOG_INFO( "locks_held: " << locks_held_, dummy  );
+                        logger::instance()->level(0) <<  "locks_held: " << locks_held_ << std::endl;
                 }
 
 
                 void unlock( lock_id_t lock )
                 {
                         locks_held_.erase( lock );
-                        LOG_INFO( "locks_held: " << locks_held_, dummy );
+                        logger::instance()->level(0) <<  "locks_held: " << locks_held_ << std::endl;
                 }
 
                 bool operator==(const thread& rhs) const
@@ -48,7 +49,7 @@ namespace eraser
         template <class EraserTraits>
         std::ostream& operator<<( std::ostream& os, const thread<EraserTraits> t )
         {
-        	os << t.thread_id_;
+        	os << t.thread_id_ << ' ' <<  t.name_;
         	return os;
         }
 }

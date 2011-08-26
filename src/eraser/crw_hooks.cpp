@@ -6,11 +6,14 @@
 #include "eraser/crw_hooks.h"
 #include "eraser/agent.h"
 #include "eraser/shared_vars_manage.h"
+#include "eraser/shared_var.h"
+#include "eraser/tag.h"
 #include "eraser/thread.h"
 #include "eraser/threads_manage.h"
 #include "eraser/traits.h"
 #include "eraser/logger.h"
 #include "eraser/monitor.h"
+#include <boost/array.hpp>
 
 namespace xpr = boost::xpressive;
 
@@ -29,14 +32,10 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
                 return;
 
         jclass cls = jni->GetObjectClass(obj);
+
         std::string cls_sig = agent::instance()->class_sig( cls );
+        std::string thread_name = agent::instance()->thread_name( thread_id );
 
-
-#		if 0
-        // debugging, filter out all classes except for package "inc"
-        // nested packages are also filtered out here
-        xpr::sregex inc = xpr::as_xpr("Linc/") >> +xpr::alnum >> ';';
-#		endif
         // filter out
         xpr::sregex filter = xpr::sregex::compile( "L" + eraser::agent::instance()->filter_regex_ + ";" );
         if( !xpr::regex_match( cls_sig, filter ) )
@@ -45,15 +44,11 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
 
 		std::string name = agent::instance()->thread_name( thread_id );
         thread_t* thread = get_thread( thread_id );
-		LOG_INFO( "NEW OBJ"
-			<< " thread= " << thread_id
-			<< " thread_name= " << agent::instance()->thread_name( thread_id )
-			<< " thread_t= " << thread
-			<< " class sig= " << cls_sig
-			, name
-			);
-
-		agent::instance()->dump_threads( thread_id );
+        logger::instance()->level(1) << "NEW OBJ"
+			<< "\n\t" << "jthread name= " << thread_name
+			<< "\n\t" << "thread_t= " << thread << " " << *thread
+			<< "\n\t" << "class sig= " << cls_sig
+			<< std::endl;
 
         // get fields declared within the class of the object being created
         jint field_count = 0;
@@ -61,10 +56,19 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         err = jvmti->GetClassFields( cls, &field_count, &fields );
         check_jvmti_error(jvmti, err, "get class fields");
 
+        for( size_t j=0; j<field_count; ++j )
+        	logger::instance()->level(1) << "\t\t" << j << fields[j] << "\n";
+
         // set up eraser logic for each field
 //        jclass global_ref = jni->NewGlobalRef( cls );
         //BOOST_ASSERT( global_ref != 0 );
-        init_object_data( obj, cls, fields, (size_t)field_count );
+
+        BOOST_ASSERT_MSG( field_count<=2 , "OOPS, to small array" );
+        shared_var_t** data = new shared_var_t*[2];
+        for( size_t j=0; j<field_count; ++j)
+        	data[j] = new shared_var_t( fields[j] );
+
+    	tag_object( obj, data );
 
         // set up read/write access watches
         // this also includes static variables (duplicated over all instances)
@@ -72,7 +76,6 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         // field access events, because there is no object!
         for( size_t j=0; j<field_count; ++j )
         {
-        	LOG_INFO( "field " << j << " " << fields[j], name );
         	err = jvmti->SetFieldAccessWatch( cls, fields[j] );
     		// rude, probably better manage duplicates by ourselves
         	if( err != JVMTI_ERROR_NONE && err != JVMTI_ERROR_DUPLICATE )
@@ -91,20 +94,18 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
 {
 		LOCK_AND_EXIT_ON_DEATH();
 		std::string name = agent::instance()->thread_name( thread_id );
-		LOG_INFO( "MONITOR ENTER"
-				<< " thread= " << thread_id
-				<< " thread_name= " << agent::instance()->thread_name( thread_id )
-				<< " monitor= " << obj
-				, name );
-
-        thread_t* thread = get_thread( thread_id, "NMEN"+name );
+        thread_t* thread = get_thread( thread_id );
         BOOST_ASSERT( thread );
-        LOG_INFO( "thread_t= " << thread, name );
         jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         		fatal_error("Out of memory while trying to create new global ref.");
 
-        agent::instance()->dump_threads( thread_id );
+		logger::instance()->level(1) << "MONITOR ENTER"
+				<< "\n\t" << "jthread name= " << name
+				<< "\n\t" << "thread_t= " << thread << " " << *thread
+				<< "\n\t" << "monitor gl= " << global_ref
+				<< std::endl;
+
         thread->lock( lock(global_ref) );
 
 }
@@ -112,22 +113,21 @@ void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject o
 {
 		LOCK_AND_EXIT_ON_DEATH();
 		std::string name = agent::instance()->thread_name( thread_id );
-		LOG_INFO( "MONITOR EXIT"
-			<< " thread= " << thread_id
-			<< " thread_name= " << agent::instance()->thread_name( thread_id )
-			<< " monitor= " << obj
-			, name );
-
-		thread_t* thread = get_thread( thread_id, "NMEX"+name );
+		thread_t* thread = get_thread( thread_id );
 		BOOST_ASSERT( thread );
-        LOG_INFO( "thread_t= " << thread , name );
+
+		logger::instance()->level(1) << "MONITOR EXIT"
+				<< "\n\t" << "jthread_name= " << name
+				<< "\n\t" << "thread_t= " << thread << " " << *thread
+				<< "\n\t" << "monitor local= " << obj
+				<< std::endl;
+
 #		if 0
 		// do we really need a global reference here?
 		jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         			fatal_error("Out of memory while trying to create new global ref.");
 #		endif
-        agent::instance()->dump_threads( thread_id );
 		thread->unlock( lock(obj) );
 }
 

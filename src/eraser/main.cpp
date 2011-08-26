@@ -59,7 +59,6 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
                               , jint* new_class_data_len, unsigned char** new_class_data )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        LOG_DEBUG( eraser::agent::instance()->phase(), dummy );
         eraser::instrument_classfile( jvmti, jni, class_being_redefined, loader, name, protection_domain
                                 , class_data_len, class_data, new_class_data_len, new_class_data );
 }
@@ -67,14 +66,12 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
 void JNICALL vm_thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase(), dummy );
         eraser::thread_start( jvmti, jni, thread );
 }
 
 void JNICALL vm_thread_end( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
 {
         LOCK_AND_EXIT_ON_DEATH();
-        LOG_DEBUG( "phase=" << eraser::agent::instance()->phase(), dummy );
         eraser::thread_end( jvmti, jni, thread );
 }
 
@@ -147,17 +144,17 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         // init agent lock
         err = jvmti->CreateRawMonitor("agent lock", &(eraser::agent::instance()->monitor_));
         check_jvmti_error(jvmti, err, "create raw monitor");
-        LOG_INFO( "jvmti version= " << std::hex << version << std::dec, dummy );
+        eraser::logger::instance()->level(0) << "jvmti version= " << std::hex << version << std::dec << std::endl;
         if( options != 0 )
         {
         	po::options_description desc("Allowed options");
 
-        	unsigned int default_log_level = eraser::logger::ALWAYS;
+        	unsigned int default_log_level = 1;
         	desc.add_options()
         	    ("help", "produce help message")
         	    ("log-level", po::value<unsigned int>()->default_value( default_log_level ), "log level" )
 #				if defined( ERASER_DEBUG )
-        	    ("filter", po::value<std::string>()->default_value("inc(\\w+|\\.)*\\w+")
+        	    ("filter", po::value<std::string>()->default_value("inc.Cell")
         	    		, "regex to match classes for instrumentation")
 #				else
 				("filter", po::value<std::string>()->default_value("\\w+(\\w+|\\.)*\\w+")
@@ -190,8 +187,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         	eraser::agent::instance()->filter_regex_ = inst_filter;
         	eraser::logger::instance()->set_curr_level( vm["log-level"].as<unsigned int>() );
         }
-        LOG_INFO( "regex_filter= " << eraser::agent::instance()->filter_regex_, dummy );
-        LOG_INFO( "log level= " << eraser::logger::instance()->curr_level(), dummy );
+        eraser::logger::instance()->level(0) << "regex_filter= " << eraser::agent::instance()->filter_regex_ << std::endl;
 
 
         // set capabilities
