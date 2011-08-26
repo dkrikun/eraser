@@ -34,15 +34,15 @@ void JNICALL vm_start( jvmtiEnv *jvmti, JNIEnv *jni )
 void JNICALL vm_init( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread_id )
 {
 	eraser::scoped_lock( jvmti, eraser::agent::instance()->monitor_ );
-        eraser::thread_start( jvmti, jni, thread_id );
+	eraser::thread_start( jvmti, jni, thread_id );
 
-        jvmtiError err;
-        ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_VM_OBJECT_ALLOC );                                   
-        ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_VM_DEATH );
-        ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_FIELD_ACCESS );
-        ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_FIELD_MODIFICATION );
-        ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_THREAD_START );
-        ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_THREAD_END );
+	jvmtiError err;
+	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_VM_OBJECT_ALLOC );
+	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_VM_DEATH );
+	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_FIELD_ACCESS );
+	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_FIELD_MODIFICATION );
+	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_THREAD_START );
+	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_THREAD_END );
 }
 
 

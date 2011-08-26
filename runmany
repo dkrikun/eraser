@@ -1,0 +1,15 @@
+#! /bin/bash
+
+#$BOOST_ROOT/bjam eraser_inst variant=debug
+#javac src/eraser/Proxy.java -d bin
+classpath=$eraser/inputs/inc
+class=Inc
+args="2 5 2"
+for i in {1..20}
+do
+        rm -f dump out *.log backtrace stdout
+        ( java -Dcom.sun.management.jmxremote  -agentpath:./bin/liberaser.so=--log-level=1 -Xbootclasspath/a:./bin -cp $classpath $class $args > stdout )>& out
+        cat stdout
+done
+#java -agentpath:./bin/liberaser.so -Xbootclasspath/a:./bin -cp $eraser/inputs/trivial Inc 1 10 true
+#jdb  -J-agentpath:./bin/agent.so -J-Xbootclasspath/a:./bin -classpath $classpath $class $args

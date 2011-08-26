@@ -32,12 +32,6 @@ inline void alarm( int cls, jvmti_traits::field_id_t field_id, const thread_t& t
 }
 
 
-struct debug_obj_data
-{
-	jobject obj_;
-	jfieldID field_id_;
-	shared_var_t* shared_var_;
-};
 
 // keeps shared var logic for each field
 // only fields declared in the object class, not inherited ones
@@ -47,10 +41,13 @@ struct object_data : boost::noncopyable
 		//typedef std::map< fields_key_t, shared_var_t >		 map_t;
 		typedef std::vector<shared_var_t*>					 map_t;
 		map_t vars_;
+		jobject obj_;
 
-		object_data( fields_key_t* fields
-				, size_t num_fields, jclass cls
+		object_data( jobject obj
+				, jclass cls, fields_key_t* fields
+				, size_t num_fields
 				, shared_var_t::alarm_func_t alarm_func )
+				: obj_( obj )
 		{
 			jint ret;
 			for( size_t j=0; j<num_fields; ++j )
@@ -78,22 +75,18 @@ struct object_data : boost::noncopyable
 inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size_t num_fields )
 {
 	shared_var_t::alarm_func_t f = boost::bind( &eraser::alarm, 0, _1, _2 );
-	tag_object( obj, new object_data( field_ids, num_fields, cls, f ));
+	tag_object( obj, new object_data( obj, cls, field_ids, num_fields, f ));
 }
 
 inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 {
-	shared_var_t** od = get_tag<shared_var_t*>(field_object);
+	object_data* od = get_tag<object_data>(field_object);
 	BOOST_ASSERT( od != 0 );
-	//shared_var_t* res =  od->get_shared_var( field_id );
-	BOOST_ASSERT( od[0] && od[1] );
-	if( od[0]->field_id_ == field_id )
-		return od[0];
-	else if( od[1]->field_id_ == field_id )
-		return od[1];
-	else
-		BOOST_ASSERT_MSG( false, "FAILED search in shared_vars" );
-	return 0;
+	BOOST_ASSERT( agent::instance()->jni()->IsSameObject( field_object, od->obj_) == JNI_TRUE );
+	shared_var_t* res =  od->get_shared_var( field_id );
+	BOOST_ASSERT_MSG( res, "FAILED search in shared_vars" );
+	if( res == 0 )
+		return 0;
 }
 
 }

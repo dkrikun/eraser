@@ -4,6 +4,7 @@
 #include <boost/xpressive/xpressive.hpp>
 
 #include "eraser/crw_hooks.h"
+#include "eraser/vm_hooks.h"
 #include "eraser/agent.h"
 #include "eraser/shared_vars_manage.h"
 #include "eraser/shared_var.h"
@@ -64,16 +65,16 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
 //        jclass global_ref = jni->NewGlobalRef( cls );
         //BOOST_ASSERT( global_ref != 0 );
 
-        BOOST_ASSERT_MSG( field_count<=2 , "OOPS, to small array" );
+//        BOOST_ASSERT_MSG( field_count<=2 , "OOPS, to small array" );
 //        shared_var_t** data = new shared_var_t*[2];
 //        for( size_t j=0; j<field_count; ++j)
 //        	data[j] = new shared_var_t( fields[j] );
-
-        debug_obj_data* x = new debug_obj_data;
-        x->field_id_ = fields[0];
-        x->obj_ = jni->NewGlobalRef(obj);
-        x->shared_var_ = new shared_var_t( fields[0] );
-    	tag_object( obj, x );
+//
+//        debug_obj_data* x = new debug_obj_data;
+//        x->field_id_ = fields[0];
+//        x->obj_ = jni->NewGlobalRef(obj);
+//        x->shared_var_ = new shared_var_t( fields[0] );
+        init_object_data( obj, cls, fields, field_count );
 
         // set up read/write access watches
         // this also includes static variables (duplicated over all instances)

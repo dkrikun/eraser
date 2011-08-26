@@ -4,6 +4,7 @@
 #include <jvmti.h>
 #include "eraser/agent.h"
 #include "sun/agent_util.h"
+#include "eraser/logger.h"
 
 namespace eraser
 {
