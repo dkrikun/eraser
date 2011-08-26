@@ -1,7 +1,7 @@
 
 #include <jvmti.h>
 #include <vector>
-#include <boost/assert.hpp>
+#include "eraser/assert_handler.h"
 #include "eraser/logger.h"
 #include "eraser/agent.h"
 #include "eraser/threads_manage.h"
@@ -42,7 +42,7 @@ void agent::dump_threads() const
 	for( size_t j=0; j<threads.size(); ++j )
 	{
 		jthread& curr = threads[j];
-		LOG_INFO( j << "\n\n" << PrintStack() << "\n\n"
+		LOG_INFO( j
 				<< "\n\t" << "thread= " << curr
 				<< "\n\t" << "thread name= " << thread_name( curr )
 				<< "\n\t" << "thread_t= " << get_thread( curr, "DUMP__" )

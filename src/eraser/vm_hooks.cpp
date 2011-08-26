@@ -42,8 +42,6 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 		LOG_INFO( "thread_t= " << thread, thread_name );
 
 		tag_object( thread_id, thread );
-		thread_t* thread2 = get_thread(thread_id);
-		LOG_INFO("A FUNNY LOG", "");
 
 		//agent::instance()->dump_threads( thread_id );
 }

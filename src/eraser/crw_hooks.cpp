@@ -44,7 +44,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
 
 
 		std::string name = agent::instance()->thread_name( thread_id );
-        thread_t* thread = get_thread( thread_id, "NNO"+name );
+        thread_t* thread = get_thread( thread_id );
 		LOG_INFO( "NEW OBJ"
 			<< " thread= " << thread_id
 			<< " thread_name= " << agent::instance()->thread_name( thread_id )
@@ -62,6 +62,8 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         check_jvmti_error(jvmti, err, "get class fields");
 
         // set up eraser logic for each field
+//        jclass global_ref = jni->NewGlobalRef( cls );
+        //BOOST_ASSERT( global_ref != 0 );
         init_object_data( obj, cls, fields, (size_t)field_count );
 
         // set up read/write access watches

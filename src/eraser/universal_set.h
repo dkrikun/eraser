@@ -3,7 +3,7 @@
 #define ERASER_SET_H
 
 #include <boost/optional/optional.hpp>
-#include <boost/assert.hpp>
+#include "eraser/assert_handler.h"
 #include <boost/operators.hpp>
 #include <boost/concept_check.hpp>
 #include <list>

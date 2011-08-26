@@ -21,11 +21,11 @@ namespace eraser
 {
 
 // this is invoked when eraser logic decides to fire a data race alarm
-inline void alarm( jclass cls, jvmti_traits::field_id_t field_id, const thread_t& thread )
+inline void alarm( int cls, jvmti_traits::field_id_t field_id, const thread_t& thread )
 {
 	std::cerr
 		<< "ALARM! " << "\n"
-		<< "\tin class " << agent::instance()->class_sig( cls ) << "\n"
+		//<< "\tin class " << agent::instance()->class_sig( cls ) << "\n"
 		<< "\tfield id " << field_id << "\n"
 		<< "\tthread " << thread << "\n"
 		;
@@ -69,7 +69,7 @@ struct object_data : boost::noncopyable
 // object class is only needed for reporting in alarm function
 inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size_t num_fields )
 {
-	shared_var_t::alarm_func_t f = boost::bind( &eraser::alarm, cls, _1, _2 );
+	shared_var_t::alarm_func_t f = boost::bind( &eraser::alarm, 0, _1, _2 );
 	tag_object( obj, new object_data( field_ids, num_fields, cls, f ));
 }
 

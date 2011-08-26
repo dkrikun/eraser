@@ -168,7 +168,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         	po::variables_map vm;
         	std::vector<std::string> split_args = po::split_unix( options, "," );
 #			if defined( ERASER_DEBUG )
-        	std::cout << "Parsed args:\n\t";
+        	std::cerr << "Parsed args:\n\t";
         	std::copy( split_args.begin(), split_args.end(), std::ostream_iterator<std::string>(std::cerr," "));
         	std::cerr << std::endl;
 #			endif
