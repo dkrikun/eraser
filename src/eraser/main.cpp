@@ -156,9 +156,10 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
 #				if defined( ERASER_DEBUG )
         	    ("obj-filter", po::value<std::string>()->default_value("inc(\\w+|\\.)*\\w+")
         	    		, "regex to match classes (for field watches)")
-				("thread-filter", po::value<std::string>()->default_value("inc.Worker"
-						"|inc.SynchWorker"
-						"|inc.MethodSynchWorker")
+				("thread-filter", po::value<std::string>()->default_value("inc\\.Worker"
+						"|inc\\.SynchWorker"
+						"|inc\\.MethodSynchWorker"
+						)
 						, "regex to match thread classes")
 #				else
 				("obj-filter", po::value<std::string>()->default_value("\\w+(\\w+|\\.)*\\w+")
@@ -198,7 +199,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         	eraser::logger::instance()->set_curr_level( vm["log-level"].as<unsigned int>() );
         }
         eraser::logger::instance()->level(0) << "regex_filter= " << eraser::agent::instance()->filter_regex_ << std::endl;
-
+        eraser::logger::instance()->level(5) << "regex_filter= " << eraser::agent::instance()->thread_filter_regex_ << std::endl;
 
         // set capabilities
         jvmtiCapabilities   capabilities;

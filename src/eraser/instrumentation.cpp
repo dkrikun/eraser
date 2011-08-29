@@ -136,11 +136,9 @@ void mnr( unsigned ccount, const char** method_names
                 		+ std::string("|java/lang/Object"));
                 xpr::cregex thread_filter = xpr::cregex::compile( eraser::agent::instance()->thread_filter_regex_ );
 
-                if( xpr::regex_match( classname, filter ) )
-                	is_thread = false;
-                else if( xpr::regex_match( classname, thread_filter ))
-                	is_thread = true;
-                else
+                is_thread = xpr::regex_match( classname, thread_filter );
+                bool obj_match = xpr::regex_match( classname, filter );
+                if( !( is_thread || obj_match )  )
                 {
                 	free((void*)classname);
                 	return;
