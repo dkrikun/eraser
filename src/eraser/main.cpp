@@ -154,7 +154,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         	    ("help", "produce help message")
         	    ("log-level", po::value<unsigned int>()->default_value( default_log_level ), "log level" )
 #				if defined( ERASER_DEBUG )
-        	    ("obj-filter", po::value<std::string>()->default_value("inc(\\w+|\\.)*\\w+")
+        	    ("obj-filter", po::value<std::string>()->default_value("inc.Cell")
         	    		, "regex to match classes (for field watches)")
 				("thread-filter", po::value<std::string>()->default_value("inc\\.Worker"
 						"|inc\\.SynchWorker"

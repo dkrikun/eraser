@@ -43,7 +43,7 @@ public class Inc
             //          for (int i = 0; i < num_threads; i++)
             //                  new MethodSynchWorker(i,cell, num_iter).start();
                 
-                Worker w1 = new MethodSynchWorker( 0, cell, num_iter ); 
+                Worker w1 = new SynchWorker( 0, cell, num_iter ); 
             //  Worker w2 = new SynchWorker( 1, cell, num_iter ); 
                 //Worker w2 = new Worker( 1, cell, num_iter ); 
             //  Worker w3 = new Worker( 2, cell, num_iter ); 
