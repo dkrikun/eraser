@@ -16,6 +16,8 @@ namespace eraser
 void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
                 , jthread thread_id )
 {
+		agent::instance()->jvmti_ = jvmti;
+		agent::instance()->jni_ = jni;
 		// workaround, no new threads after 'DestroyJavaVM' are allowed
 		std::string thread_name = agent::instance()->thread_name( thread_id );
 		if( ( thread_name == "DestroyJavaVM") || agent::instance()->met_destroy_jvm_thread_ )
@@ -25,7 +27,7 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 			return;
 		}
 
-		jthread global_ref = jni->NewWeakGlobalRef( thread_id );
+		jthread global_ref = jni->NewWeakGlobalRef( thread_id );	//!!
 		if( global_ref == 0 )
 			fatal_error("Out of memory while trying to create new global ref.");
 
@@ -43,6 +45,8 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 void thread_end( jvmtiEnv *jvmti, JNIEnv *jni
                 , jthread thread_id )
 {
+		agent::instance()->jvmti_ = jvmti;
+		agent::instance()->jni_ = jni;
 		std::string thread_name = agent::instance()->thread_name( thread_id );
 		logger::instance()->level(1) << "THREAD END" << "\n"
 			<< "\t" << "jthread name= " << thread_name << "\n"
@@ -64,6 +68,8 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
                   , jlocation location, jclass field_klass
                   , jobject object, jfieldID field )
 {
+	agent::instance()->jvmti_ = jvmti;
+	agent::instance()->jni_ = jni;
 	std::string thread_name = agent::instance()->thread_name( thread_id );
 	std::string class_sig = agent::instance()->class_sig( field_klass );
 	logger::instance()->level(1) << "FIELD READ" << "\n"
@@ -97,6 +103,8 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
                    , jobject object, jfieldID field
                    , char signature_type, jvalue new_value )
 {
+	agent::instance()->jvmti_ = jvmti;
+	agent::instance()->jni_ = jni;
 	std::string thread_name = agent::instance()->thread_name( thread_id );
 	std::string class_sig = agent::instance()->class_sig( field_klass );
 	logger::instance()->level(1) << "FIELD WRITE" << "\n"

@@ -30,6 +30,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         jvmtiError err;
         jvmtiEnv* jvmti = agent::instance()->jvmti();
         BOOST_ASSERT( jni != 0 );
+		agent::instance()->jni_ = jni;
         if( agent::instance()->phase() != JVMTI_PHASE_LIVE )
                 return;
 
@@ -74,7 +75,10 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
 //        x->field_id_ = fields[0];
 //        x->obj_ = jni->NewGlobalRef(obj);
 //        x->shared_var_ = new shared_var_t( fields[0] );
-        init_object_data( obj, cls, fields, field_count );
+        jobject global_ref = jni->NewWeakGlobalRef( obj );
+        if( global_ref == 0 )
+        	fatal_error( "Insufficient memory for new ref" );
+        init_object_data( global_ref, cls, fields, field_count );
 
         // set up read/write access watches
         // this also includes static variables (duplicated over all instances)
@@ -99,10 +103,11 @@ void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
 		LOCK_AND_EXIT_ON_DEATH();
+		agent::instance()->jni_ = jni;
 		std::string name = agent::instance()->thread_name( thread_id );
         thread_t* thread = get_thread( thread_id );
         BOOST_ASSERT( thread );
-        jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
+        jobject global_ref = jni->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         		fatal_error("Out of memory while trying to create new global ref.");
 
@@ -117,7 +122,8 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
 }
 void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
-		LOCK_AND_EXIT_ON_DEATH();
+		LOCK_AND_EXIT_ON_DEATH();;
+		agent::instance()->jni_ = jni;
 		std::string name = agent::instance()->thread_name( thread_id );
 		thread_t* thread = get_thread( thread_id );
 		BOOST_ASSERT( thread );

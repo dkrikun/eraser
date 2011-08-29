@@ -9,7 +9,7 @@ public class MethodSynchWorker extends Worker
 
         public void run()
         {
-                sc.data = id;
+             // sc.data = id;
                 for( int j=0; j<num_iter; ++j )
                         step();
         }
@@ -25,8 +25,8 @@ public class MethodSynchWorker extends Worker
                         {
                                 cell.data ++;
                                 cell.id = id;
-                                Cell.sdata ++;
-                                cell.subcell = sc;
+                             // Cell.sdata ++;
+                             // cell.subcell = sc;
                         }
                 }
         }

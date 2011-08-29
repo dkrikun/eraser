@@ -41,15 +41,16 @@ public class Inc
             //          for (int i = 0; i < num_threads; i++)
             //                  new MethodSynchWorker(i,cell, num_iter).start();
                 
-                Worker w1 = new Worker( 0, cell, num_iter ); 
+                Worker w1 = new SynchWorker( 0, cell, num_iter ); 
+                Worker w2 = new SynchWorker( 1, cell, num_iter ); 
                 //Worker w2 = new Worker( 1, cell, num_iter ); 
             //  Worker w3 = new Worker( 2, cell, num_iter ); 
             //  Worker w4 = new Worker( 3, cell, num_iter ); 
                 w1.start();
-                //w2.start();
+                w2.start();
             //  w3.start();
             //  w4.start();
 
-                System.out.println("Result: " + cell.data + " " + cell.id);
+             // System.out.println("Result: " + cell.data + " " + cell.id);
         }
 } 

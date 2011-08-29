@@ -53,7 +53,7 @@ struct object_data : boost::noncopyable
 			for( size_t j=0; j<num_fields; ++j )
 			{
 				// skip static fields
-				agent::instance()->jvmti()->GetFieldModifiers(cls, fields[j], &ret);
+				agent::instance()->jvmti()->GetFieldModifiers( cls, fields[j], &ret );
 				if (ret & JVM_ACC_STATIC)
 					continue;
 				//vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
