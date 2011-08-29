@@ -42,12 +42,14 @@ struct object_data : boost::noncopyable
 		typedef std::vector<shared_var_t*>					 map_t;
 		map_t vars_;
 		jobject obj_;
+		std::string type_;
 
 		object_data( jobject obj
 				, jclass cls, fields_key_t* fields
 				, size_t num_fields
 				, shared_var_t::alarm_func_t alarm_func )
 				: obj_( obj )
+				, type_( "object_data" )
 		{
 			jint ret;
 			for( size_t j=0; j<num_fields; ++j )
@@ -82,6 +84,7 @@ inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 {
 	object_data* od = get_tag<object_data>(field_object);
 	BOOST_ASSERT( od != 0 );
+	logger::instance()->level(5) << "OBJ TYPE=" << od->type_ << std::endl;
 	BOOST_ASSERT( agent::instance()->jni()->IsSameObject( field_object, od->obj_) == JNI_TRUE );
 	shared_var_t* res =  od->get_shared_var( field_id );
 	BOOST_ASSERT_MSG( res, "FAILED search in shared_vars" );
