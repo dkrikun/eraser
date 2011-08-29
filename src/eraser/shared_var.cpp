@@ -10,6 +10,7 @@
 
 #include "eraser/shared_var.h"
 #include "eraser/logger.h"
+#include "eraser/lock_policy.h"
 
 
 namespace msm = boost::msm;
@@ -48,9 +49,11 @@ namespace shared_var_fsm
     // front-end: define the FSM structure 
     template <class EraserTraits>
     struct eraser_ : public msm::front::state_machine_def< eraser_<EraserTraits> >
+    			   , public eraser::lock_policy<EraserTraits>
     {
         typedef typename eraser::thread<EraserTraits>   thread_t;
         typedef typename EraserTraits::lock_id_t        lock_t;
+        typedef eraser::lock_policy<EraserTraits>		lock_policy_t;
 
         typedef boost::function< void(const thread_t&) > alarm_func_bound_t;    // field_id is already bound
         eraser_( const alarm_func_bound_t& alarm )
@@ -86,7 +89,7 @@ namespace shared_var_fsm
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
-
+                		fsm.global_lock();
                 		logger::instance()->level(0) << "last acc. thread=";
                 		if( last_accessing_thread_ )
                 			logger::instance()->level(0) << *last_accessing_thread_ << std::endl;
@@ -94,6 +97,7 @@ namespace shared_var_fsm
                 			logger::instance()->level(0)  << "null" << std::endl;
                 		logger::instance()->level(0)
                 				<< "curr. acc. thread=" << e.accessing_thread_ << std::endl;
+                		fsm.global_unlock();
                         last_accessing_thread_ = e.accessing_thread_;
                 }
         };
@@ -113,8 +117,10 @@ namespace shared_var_fsm
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
+                		fsm.global_lock();
                 		eraser::logger::instance()->level(1) << "CV: " << fsm.cv_ << std::endl;
                 		eraser::logger::instance()->level(1) << "locks_held: " << e.accessing_thread_.locks_held_ << std::endl;
+                		fsm.global_unlock();
                         // update cv & check data races
                         fsm.update_cv( e.accessing_thread_.locks_held_ );
                         if( fsm.cv_empty() && fsm.alarm_ )
@@ -128,10 +134,12 @@ namespace shared_var_fsm
         struct dbg_trans 
         {
                 template <class EVT,class FSM,class SourceState,class TargetState>
-                void operator()(EVT const& e, FSM&, SourceState& s ,TargetState& t )
+                void operator()(EVT const& e, FSM& fsm, SourceState& s ,TargetState& t )
                 {
+                	fsm.global_lock();
                 	eraser::logger::instance()->level(2) << "on " << typeid(EVT).name() << ": "
                         << typeid(SourceState).name() << " --> " << typeid(TargetState).name() << std::endl;
+                	fsm.global_unlock();
                 }
         };
 
@@ -184,11 +192,13 @@ namespace shared_var_fsm
 
         // replaces the default no-transition response
         template <class FSM,class Event>
-        void no_transition(Event const& e, FSM&,int state)
+        void no_transition(Event const& e, FSM& fsm,int state)
         {
+        	fsm.global_lock();
         	eraser::logger::instance()->level(2) << "NO TRANS on "
         			<< typeid(Event).name() << " from " << state << std::endl;
             BOOST_ASSERT_MSG(false, "No transition in fsm");
+            fsm.global_unlock();
         }
     };
 

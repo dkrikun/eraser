@@ -56,6 +56,7 @@ struct agent : boost::noncopyable
         bool                     death_active_;
         bool					 met_destroy_jvm_thread_;
         std::string 			 filter_regex_;
+        std::string 			 thread_filter_regex_;
 
 
    private:

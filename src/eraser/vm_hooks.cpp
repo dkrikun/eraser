@@ -88,7 +88,7 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
 //	debug_obj_data* x = get_tag<debug_obj_data>( object );
 //	BOOST_ASSERT( jni->IsSameObject( x->obj_, object ) == JNI_TRUE );
 //	shared_var_t* shared_var = x->shared_var_;
-	BOOST_ASSERT( shared_var != 0 );
+//	BOOST_ASSERT( shared_var != 0 );
 
 	logger::instance()->level(1)
 						<< "\t" << "thread_t= " << thread << " " << *thread

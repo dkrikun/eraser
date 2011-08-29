@@ -85,8 +85,7 @@ inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 	BOOST_ASSERT( agent::instance()->jni()->IsSameObject( field_object, od->obj_) == JNI_TRUE );
 	shared_var_t* res =  od->get_shared_var( field_id );
 	BOOST_ASSERT_MSG( res, "FAILED search in shared_vars" );
-	if( res == 0 )
-		return 0;
+	return res;
 }
 
 }

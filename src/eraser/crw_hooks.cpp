@@ -60,7 +60,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         check_jvmti_error(jvmti, err, "get class fields");
 
         for( size_t j=0; j<field_count; ++j )
-        	logger::instance()->level(1) << "\t\t" << j << fields[j] << "\n";
+        	logger::instance()->level(1) << "\t\t" << j << " " << fields[j] << "\n";
 
         // set up eraser logic for each field
 //        jclass global_ref = jni->NewGlobalRef( cls );
@@ -106,7 +106,8 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
 		agent::instance()->jni_ = jni;
 		std::string name = agent::instance()->thread_name( thread_id );
         thread_t* thread = get_thread( thread_id );
-        BOOST_ASSERT( thread );
+        if( thread == 0 )
+        	return;
         jobject global_ref = jni->NewWeakGlobalRef( obj );
         if( global_ref == 0 )
         		fatal_error("Out of memory while trying to create new global ref.");
@@ -126,7 +127,8 @@ void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject o
 		agent::instance()->jni_ = jni;
 		std::string name = agent::instance()->thread_name( thread_id );
 		thread_t* thread = get_thread( thread_id );
-		BOOST_ASSERT( thread );
+        if( thread == 0 )
+        	return;
 
 		logger::instance()->level(1) << "MONITOR EXIT"
 				<< "\n\t" << "jthread_name= " << name

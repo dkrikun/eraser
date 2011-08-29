@@ -154,11 +154,17 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         	    ("help", "produce help message")
         	    ("log-level", po::value<unsigned int>()->default_value( default_log_level ), "log level" )
 #				if defined( ERASER_DEBUG )
-        	    ("filter", po::value<std::string>()->default_value("inc.Cell")
-        	    		, "regex to match classes for instrumentation")
+        	    ("obj-filter", po::value<std::string>()->default_value("inc(\\w+|\\.)*\\w+")
+        	    		, "regex to match classes (for field watches)")
+				("thread-filter", po::value<std::string>()->default_value("inc.Worker"
+						"|inc.SynchWorker"
+						"|inc.MethodSynchWorker")
+						, "regex to match thread classes")
 #				else
-				("filter", po::value<std::string>()->default_value("\\w+(\\w+|\\.)*\\w+")
-						, "regex to match classes for instrumentation")
+				("obj-filter", po::value<std::string>()->default_value("\\w+(\\w+|\\.)*\\w+")
+						, "regex to match classes (for field watches)")
+				("thread-filter", po::value<std::string>()->default_value("java.lang.Thread")
+						, "regex to match thread classes")
 #				endif
         	;
 
@@ -182,9 +188,13 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         	// i.e. java.lang.Object --> java/lang/Object
     		xpr::sregex dot = xpr::as_xpr("\\.");
     		std::string slash = "/";
-    		std::string inst_filter = xpr::regex_replace( vm["filter"].as<std::string>(), dot, slash );
+        	eraser::agent::instance()
+        		->filter_regex_ = xpr::regex_replace( vm["obj-filter"]
+        		                                         .as<std::string>(), dot, slash );
+        	eraser::agent::instance()
+        		->thread_filter_regex_ = xpr::regex_replace( vm["thread-filter"]
+        		                                                .as<std::string>(), dot, slash );
 
-        	eraser::agent::instance()->filter_regex_ = inst_filter;
         	eraser::logger::instance()->set_curr_level( vm["log-level"].as<unsigned int>() );
         }
         eraser::logger::instance()->level(0) << "regex_filter= " << eraser::agent::instance()->filter_regex_ << std::endl;
