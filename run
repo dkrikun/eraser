@@ -7,6 +7,9 @@ class=Inc
 args="2 5 2"
 rm -f dump out *.log backtrace stdout
 
+( cd inputs/inc/inc ; javac *.java )
+( cd inputs/inc ; javac *.java)
+
 ( java -Dcom.sun.management.jmxremote  -agentpath:./bin/liberaser.so=--log-level=1 -Xbootclasspath/a:./bin -cp $classpath $class $args > stdout ) >& out
 #java -agentpath:./bin/liberaser.so -Xbootclasspath/a:./bin -cp $eraser/inputs/trivial Inc 1 10 true
 #jdb  -J-agentpath:./bin/agent.so -J-Xbootclasspath/a:./bin -classpath $classpath $class $args
