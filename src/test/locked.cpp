@@ -42,9 +42,9 @@ struct TEST_NAME : public ::testing::Test
         TEST_NAME()
                 : uut( field_id_t(0)
                      , boost::bind( &alarm_func::alarm, &alarm_, _1, _2 ) )     // create mock alarm handler
-                , thread_1( thread_id_t(1) )
-                , thread_2( thread_id_t(2) )
-                , thread_3( thread_id_t(3) )
+                , thread_1( thread_id_t(1), "thread_1" )
+                , thread_2( thread_id_t(2), "thread_2" )
+                , thread_3( thread_id_t(3), "thread_3" )
                 , l1( lock_id_t(10) )
                 , l2( lock_id_t(20) )
                 , l3( lock_id_t(30) )

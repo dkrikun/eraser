@@ -36,6 +36,7 @@ namespace boost
 	{
 		eraser::backtrace();
 		std::cerr << "^^^ ASSERTION FAILED '" << expr << "', in "  << function << ", " << file << ":" << line << "^^^ \n";
+		::abort();
 	}
 
 	inline void assertion_failed_msg(char const * expr, char const * msg,
@@ -44,6 +45,7 @@ namespace boost
 		eraser::backtrace();
 		std::cerr << "^^^ ASSERTION FAILED '" << expr << "', in "  << function << ", " << file << ":" << line
 				<< ", " << msg << "^^^ \n";
+		::abort();
 	}
 }
 

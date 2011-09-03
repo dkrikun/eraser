@@ -25,34 +25,36 @@ public class Inc
                 int num_threads = Integer.parseInt(argv[0]);
                 int num_iter = Integer.parseInt(argv[1]);
                 int worker_kind = Integer.parseInt(argv[2]);
+                System.out.println("Hey there me monkey robot!");
 
                 //readLine();
 
-                num_iter = 1;
+                num_iter = 50;
 
                 Cell cell = new Cell();
             //  Cell cell2 = new Cell();
 
-            	if( worker_kind == 0 )
-                        for (int i = 0; i < num_threads; i++)
-                                new Worker(i,cell, num_iter).start();
-                else if( worker_kind == 1 )
-                        for (int i = 0; i < num_threads; i++)
-                                new SynchWorker(i,cell, num_iter).start();
-                else
-                        for (int i = 0; i < num_threads; i++)
-                                new MethodSynchWorker(i,cell, num_iter).start();
+           //   if( worker_kind == 0 )
+           //           for (int i = 0; i < num_threads; i++)
+           //                   new Worker(i,cell, num_iter).start();
+           //   else if( worker_kind == 1 )
+           //           for (int i = 0; i < num_threads; i++)
+           //                   new SynchWorker(i,cell, num_iter).start();
+           //   else
+           //           for (int i = 0; i < num_threads; i++)
+           //                   new MethodSynchWorker(i,cell, num_iter).start();
                 
-//                Worker w1 = new SynchWorker( 0, cell, num_iter ); 
-            //  Worker w2 = new SynchWorker( 1, cell, num_iter ); 
+                Worker w1 = new SynchWorker( 0, cell, num_iter ); 
+                Worker w2 = new SynchWorker( 1, cell, num_iter ); 
                 //Worker w2 = new Worker( 1, cell, num_iter ); 
             //  Worker w3 = new Worker( 2, cell, num_iter ); 
             //  Worker w4 = new Worker( 3, cell, num_iter ); 
-  //              w1.start();
-            //  w2.start();
+                w1.start();
+                w2.start();
             //  w3.start();
             //  w4.start();
 
-             // System.out.println("Result: " + cell.data + " " + cell.id);
+              //System.out.println("Result: " + cell.data + " " + cell.id);
+              try{ Thread.sleep(10000); }catch(java.lang.InterruptedException e) { System.out.println("INterrupted!!"); }
         }
 } 

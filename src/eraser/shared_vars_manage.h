@@ -21,11 +21,11 @@ namespace eraser
 {
 
 // this is invoked when eraser logic decides to fire a data race alarm
-inline void alarm( int cls, jvmti_traits::field_id_t field_id, const thread_t& thread )
+inline void alarm( jclass cls, jvmti_traits::field_id_t field_id, const thread_t& thread )
 {
 	std::cerr
 		<< "ALARM! " << "\n"
-		//<< "\tin class " << agent::instance()->class_sig( cls ) << "\n"
+		<< "\tin class " << agent::instance()->class_sig( cls ) << "\n"
 		<< "\tfield id " << field_id << "\n"
 		<< "\tthread " << thread << "\n"
 		;
@@ -35,6 +35,7 @@ inline void alarm( int cls, jvmti_traits::field_id_t field_id, const thread_t& t
 
 // keeps shared var logic for each field
 // only fields declared in the object class, not inherited ones
+
 struct object_data : boost::noncopyable
 {
 		typedef jvmti_traits::field_id_t                     fields_key_t;
@@ -76,7 +77,7 @@ struct object_data : boost::noncopyable
 // object class is only needed for reporting in alarm function
 inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size_t num_fields )
 {
-	shared_var_t::alarm_func_t f = boost::bind( &eraser::alarm, 0, _1, _2 );
+	shared_var_t::alarm_func_t f = boost::bind( &eraser::alarm, cls, _1, _2 );
 	tag_object( obj, new object_data( obj, cls, field_ids, num_fields, f ));
 }
 
@@ -85,7 +86,8 @@ inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 	object_data* od = get_tag<object_data>(field_object);
 	BOOST_ASSERT( od != 0 );
 	logger::instance()->level(5) << "OBJ TYPE=" << od->type_ << std::endl;
-	BOOST_ASSERT( agent::instance()->jni()->IsSameObject( field_object, od->obj_) == JNI_TRUE );
+	JNIEnv* jni = agent::instance()->jni();
+	BOOST_ASSERT( jni->IsSameObject( field_object, od->obj_) == JNI_TRUE );
 	shared_var_t* res =  od->get_shared_var( field_id );
 	BOOST_ASSERT_MSG( res, "FAILED search in shared_vars" );
 	return res;

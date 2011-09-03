@@ -1,15 +1,17 @@
 #! /bin/bash
 
+java_prefix="/usr/lib/jvm/default-java"
+
 $BOOST_ROOT/bjam eraser_inst variant=debug
-javac src/eraser/Proxy.java -d bin
+$java_prefix/bin/javac src/eraser/Proxy.java -d bin
 classpath=$eraser/inputs/inc
 class=Inc
 args="2 5 2"
 rm -f dump out *.log backtrace stdout
 
-( cd inputs/inc/inc ; javac *.java )
-( cd inputs/inc ; javac *.java)
+( cd inputs/inc/inc ; $java_prefix/bin/javac *.java )
+( cd inputs/inc ; $java_prefix/bin/javac *.java)
 
-( java -Dcom.sun.management.jmxremote  -agentpath:./bin/liberaser.so=--log-level=1 -Xbootclasspath/a:./bin -cp $classpath $class $args > stdout ) >& out
-#java -agentpath:./bin/liberaser.so -Xbootclasspath/a:./bin -cp $eraser/inputs/trivial Inc 1 10 true
-#jdb  -J-agentpath:./bin/agent.so -J-Xbootclasspath/a:./bin -classpath $classpath $class $args
+( $java_prefix/bin/java -Xcheck:jni -Xloggc:gc.log -verbose:jni -agentpath:./bin/liberaser.so=--log-level=1 -Xbootclasspath/a:./bin -cp $classpath $class $args > stdout )>& out
+#gdb --args java -agentpath:./bin/liberaser.so=--log-level=1 -Xbootclasspath/a:./bin -cp $classpath $class $args
+#$java_prefix/bin/jdb  -J-agentpath:./bin/agent.so -J-Xbootclasspath/a:./bin -classpath $classpath $class $args

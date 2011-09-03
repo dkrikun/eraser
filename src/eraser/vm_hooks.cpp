@@ -22,12 +22,13 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 		std::string thread_name = agent::instance()->thread_name( thread_id );
 		if( ( thread_name == "DestroyJavaVM") || agent::instance()->met_destroy_jvm_thread_ )
 		{
+			logger::instance()->level(5) << "met DestroyJavaVM thread, aborting" << std::endl;
 			agent::instance()->met_destroy_jvm_thread_ = true;
 			agent::instance()->death_active_ = true;
 			return;
 		}
 
-		jthread global_ref = jni->NewWeakGlobalRef( thread_id );	//!!
+		jthread global_ref = jni->NewGlobalRef( thread_id );
 		if( global_ref == 0 )
 			fatal_error("Out of memory while trying to create new global ref.");
 
@@ -60,6 +61,7 @@ void thread_end( jvmtiEnv *jvmti, JNIEnv *jni
 				<< "thread_t= " << thread << " " << *thread
 				<< std::endl;
 
+		//jni->DeleteGlobalRef( thread_id );
 		clear_tag( thread_id );
 }
 

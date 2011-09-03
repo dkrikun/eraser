@@ -35,7 +35,6 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
                 return;
 
         jclass cls = jni->GetObjectClass(obj);
-
         std::string cls_sig = agent::instance()->class_sig( cls );
         std::string thread_name = agent::instance()->thread_name( thread_id );
 
@@ -44,7 +43,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         if( !xpr::regex_match( cls_sig, filter ) )
         	return;
 
-
+        // some debug print
 		std::string name = agent::instance()->thread_name( thread_id );
         thread_t* thread = get_thread( thread_id );
         logger::instance()->level(1) << "NEW OBJ"
@@ -59,26 +58,19 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         err = jvmti->GetClassFields( cls, &field_count, &fields );
         check_jvmti_error(jvmti, err, "get class fields");
 
+        // debug print
         for( size_t j=0; j<field_count; ++j )
         	logger::instance()->level(1) << "\t\t" << j << " " << fields[j] << "\n";
 
         // set up eraser logic for each field
-//        jclass global_ref = jni->NewGlobalRef( cls );
-        //BOOST_ASSERT( global_ref != 0 );
-
-//        BOOST_ASSERT_MSG( field_count<=2 , "OOPS, to small array" );
-//        shared_var_t** data = new shared_var_t*[2];
-//        for( size_t j=0; j<field_count; ++j)
-//        	data[j] = new shared_var_t( fields[j] );
-//
-//        debug_obj_data* x = new debug_obj_data;
-//        x->field_id_ = fields[0];
-//        x->obj_ = jni->NewGlobalRef(obj);
-//        x->shared_var_ = new shared_var_t( fields[0] );
-        jobject global_ref = jni->NewWeakGlobalRef( obj );
-        if( global_ref == 0 )
+        jobject obj_gr = jni->NewGlobalRef( obj );
+        if( obj_gr == 0 )
         	fatal_error( "Insufficient memory for new ref" );
-        init_object_data( global_ref, cls, fields, field_count );
+        jclass cls_gr = (jclass)jni->NewGlobalRef( cls );
+        if( cls_gr == 0 )
+        	fatal_error( "Insufficient memory for new ref" );
+
+        init_object_data( obj_gr, cls_gr, fields, field_count );
 
         // set up read/write access watches
         // this also includes static variables (duplicated over all instances)
@@ -108,7 +100,7 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
         thread_t* thread = get_thread( thread_id );
         if( thread == 0 )
         	return;
-        jobject global_ref = jni->NewWeakGlobalRef( obj );
+        jobject global_ref = jni->NewGlobalRef( obj );
         if( global_ref == 0 )
         		fatal_error("Out of memory while trying to create new global ref.");
 
@@ -123,7 +115,7 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
 }
 void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
-		LOCK_AND_EXIT_ON_DEATH();;
+		LOCK_AND_EXIT_ON_DEATH();
 		agent::instance()->jni_ = jni;
 		std::string name = agent::instance()->thread_name( thread_id );
 		thread_t* thread = get_thread( thread_id );
@@ -138,7 +130,7 @@ void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject o
 
 #		if 0
 		// do we really need a global reference here?
-		jobject global_ref = agent::instance()->jni()->NewWeakGlobalRef( obj );
+		jobject global_ref = jni->NewGlobalRef( obj );
         if( global_ref == 0 )
         			fatal_error("Out of memory while trying to create new global ref.");
 #		endif

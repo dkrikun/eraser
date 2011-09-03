@@ -28,9 +28,10 @@ struct agent : boost::noncopyable
         jvmtiPhase phase() const;
         std::vector<jthread> all_threads() const;
         void dump_threads() const;
-        void dump_threads( jthread to_compare ) const;
+        void dump_threads( jthread to_compare );
         std::string class_sig( jclass cls ) const;
         std::string thread_name( jthread thread ) const;
+        void reload_jni();
 
         static agent* instance()
         {
@@ -38,9 +39,12 @@ struct agent : boost::noncopyable
                 return &agent_;
         }
 
-        JNIEnv* jni() const
+
+
+        JNIEnv* jni()
         {
                 BOOST_ASSERT_MSG( jni_ != 0, "jni ptr has not been initialized" );
+                reload_jni();
                 return jni_;
         }
 
@@ -50,8 +54,15 @@ struct agent : boost::noncopyable
                 return jvmti_;
         }
 
+        JavaVM* jvm() const
+        {
+        		BOOST_ASSERT_MSG( jvm_ != 0, "jvm ptr has not been initialized" );
+        		return jvm_;
+        }
+
         jvmtiEnv*                jvmti_;
         JNIEnv*                  jni_;
+        JavaVM*				     jvm_;
         jrawMonitorID            monitor_;
         bool                     death_active_;
         bool					 met_destroy_jvm_thread_;
@@ -63,6 +74,7 @@ struct agent : boost::noncopyable
         agent()
                 : jvmti_(0)
 				, jni_(0)
+        		, jvm_(0)
         		, met_destroy_jvm_thread_( false )
         {}
 };

@@ -50,7 +50,7 @@ void agent::dump_threads() const
 	}
 }
 
-void agent::dump_threads( jthread to_compare ) const
+void agent::dump_threads( jthread to_compare )
 {
 	std::string name = thread_name(to_compare);
 	logger::instance()->level(1) << " ALL THREADS DUMP compared to " << name;
@@ -85,6 +85,22 @@ std::string agent::thread_name( jthread thread ) const
 	err = jvmti()->GetThreadInfo( thread, &ti );
 	check_jvmti_error( jvmti(), err, "get thread info" );
 	return ti.name;
+}
+
+void agent::reload_jni()
+{
+	jint res;
+	JNIEnv* env = 0;
+	res = jvm()->GetEnv( (void**)&env, JNI_VERSION_1_2 );
+	if( res == JNI_EDETACHED )
+	{
+		res = jvm()->AttachCurrentThread( (void **)&env, 0 );
+		if( res != JNI_OK || env == 0 )
+			fatal_error( "ERROR: Unable to create JNIEnv by attach, error=%d\n", res );
+	}
+    else if( res != JNI_OK || env == 0 )
+		fatal_error( "ERROR: Unable to create JNIEnv, error=%d\n", res );
+	jni_ = env;
 }
 
 
