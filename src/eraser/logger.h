@@ -53,7 +53,7 @@ struct logger : boost::noncopyable
 
 };
 
-#define INFO "[" << __FILE__ << "|" <<  __LINE__ << "|" << __FUNCTION__ << "]"
+#define INFO std::dec << "[" << __FILE__ << "|" <<  __LINE__ << "|" << __FUNCTION__ << "]"
 
 }
 

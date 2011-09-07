@@ -9,6 +9,7 @@ namespace eraser
 
 bool lock::operator==( const lock& rhs ) const
 {
+	scoped_lock( agent::instance()->jvmti(), agent::instance()->monitor_ );
 	bool res = ( agent::instance()->jni()->IsSameObject( lock_id_, rhs.lock_id_ ) == JNI_TRUE );
 	logger::instance()->level(1) << INFO << "lock compare res: " << std::boolalpha << res << std::endl;
 	return res;
