@@ -8,5 +8,18 @@ Inc, 4 manual SyncWorkers, 10 iterations - no alarms, shared_modified - all OK.
 Same but main thread prints the result in the end (i.e unlocked access to the same variables - data race alarm expected) - no alarm..
         but it is exactly according to the eraser logic! Main reads vars first, so it is the main who initializes.
 
+Inc, 1 manual Worker. OK
+Inc, 2 manual Worker(only id field written). Expected alarm - got 19 alarms, as expected for 2 threads * 10 writes each ( one is initialization).
+
+Inc, 1 method synch worker. This guy has lots of locks taken - mistakenly none of them common to any of the threads. 
+ So expected alarms here. No alarms?? That is weird..
+ I observe 1 of 3 lock comparisons evaluates to true, which means, it thinks there is a common lock in this story. Lets see which of them.
+ I suspect syncronized method is faulty.. yep. Wait, .. does synchronized method locks on this or on class? On this for non-statics. And this is
+ not static. So its incorrect here. Maybe instrumentation is incorrect?
+ Ouch that craches sometimes. Luckily, crashes rare, but the result of lock compare is non-deterministic. The crash was about the same old 
+ 'using JNIEnv from wrong thread'. Ouch, runmany crashes oftentimes.
+ Don't get how is that possible.. jni env is always reloaded prior to its use..
+ Some wild crazy context switch on inspite of monitor enter/exit?
+
 
 

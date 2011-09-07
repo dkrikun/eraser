@@ -19,16 +19,16 @@ public class MethodSynchWorker extends Worker
 
         synchronized public void step()
         {
-                synchronized(another_lock)
-                {
-                        synchronized(yet_another_lock)
-                        {
+            //  synchronized(another_lock)
+            //  {
+            //          synchronized(yet_another_lock)
+            //          {
                                 cell.data ++;
                                 cell.id = id;
                              // Cell.sdata ++;
                              // cell.subcell = sc;
-                        }
-                }
+            //          }
+            //  }
         }
 }
 

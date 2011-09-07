@@ -108,6 +108,13 @@ namespace shared_var_fsm
                 void on_entry(Event const& e, FSM& fsm)
                 {
                         // update cv
+						fsm.global_lock();
+						eraser::logger::instance()->level(1) << "CV: " << fsm.cv_ << std::endl;
+						eraser::logger::instance()->level(1) << "locks_held by thread "
+								<< e.accessing_thread_ << ": "
+								<< e.accessing_thread_.locks_held_
+								<< std::endl;
+						fsm.global_unlock();
                         fsm.update_cv( e.accessing_thread_.locks_held_ );
                 }
         };
@@ -119,7 +126,10 @@ namespace shared_var_fsm
                 {
                 		fsm.global_lock();
                 		eraser::logger::instance()->level(1) << "CV: " << fsm.cv_ << std::endl;
-                		eraser::logger::instance()->level(1) << "locks_held: " << e.accessing_thread_.locks_held_ << std::endl;
+                		eraser::logger::instance()->level(1) << "locks_held by thread "
+                				<< e.accessing_thread_ << ": "
+                				<< e.accessing_thread_.locks_held_
+                				<< std::endl;
                 		fsm.global_unlock();
                         // update cv & check data races
                         fsm.update_cv( e.accessing_thread_.locks_held_ );

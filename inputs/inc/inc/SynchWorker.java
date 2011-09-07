@@ -13,7 +13,7 @@ public class SynchWorker extends Worker
          //     sc.data = id;
                 for( int j=0; j<num_iter; ++j )
                 {
-                        synchronized(this)
+                        synchronized(cell)
                         {
                                 cell.data ++;
                                 cell.id = id;

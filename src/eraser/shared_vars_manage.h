@@ -85,7 +85,7 @@ inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 {
 	object_data* od = get_tag<object_data>(field_object);
 	BOOST_ASSERT( od != 0 );
-	logger::instance()->level(5) << "OBJ TYPE=" << od->type_ << std::endl;
+	logger::instance()->level(0) << "OBJ TYPE=" << od->type_ << std::endl;
 	JNIEnv* jni = agent::instance()->jni();
 	BOOST_ASSERT( jni->IsSameObject( field_object, od->obj_) == JNI_TRUE );
 	shared_var_t* res =  od->get_shared_var( field_id );
