@@ -1,0 +1,12 @@
+
+Inc, 1 manual SynchWorker, 1 Cell w/ data & id fields being r/w, for 5 iterations - no alarms observed as expected - OK.
+Inc, 2 manual SynchWorker, 1 Cell w/ data & id fields being r/w, for 5 iterations - observed alarms (incorrect), debug prints lock comparison= false.
+Actually this IS correct because it is really not the same lock!
+Same as before, but now fixed to lock on cell mutex - no alarms, fsm moves to shared_modified state as expected - OK.
+Same for 50 iterations - OK.
+Inc, 4 manual SyncWorkers, 10 iterations - no alarms, shared_modified - all OK.
+Same but main thread prints the result in the end (i.e unlocked access to the same variables - data race alarm expected) - no alarm..
+        but it is exactly according to the eraser logic! Main reads vars first, so it is the main who initializes.
+
+
+
