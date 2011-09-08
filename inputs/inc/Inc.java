@@ -46,8 +46,8 @@ public class Inc
                 
              // Worker w1 = new Worker( 0, cell, num_iter ); 
              // Worker w2 = new Worker( 1, cell, num_iter ); 
-                Worker w3 = new MethodSynchWorker( 2, cell, num_iter ); 
-                Worker w4 = new MethodSynchWorker( 3, cell, num_iter ); 
+                Worker w3 = new SynchWorker( 2, cell, num_iter ); 
+                Worker w4 = new SynchWorker( 3, cell, num_iter ); 
              // w1.start();
              // w2.start();
                 w3.start();

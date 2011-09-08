@@ -13,6 +13,7 @@
 #include "eraser/common.h"
 #include "eraser/traits.h"
 #include "eraser/tag.h"
+#include "eraser/static_vars.h"
 
 
 namespace xpr = boost::xpressive;
@@ -55,12 +56,14 @@ struct object_data : boost::noncopyable
 			jint ret;
 			for( size_t j=0; j<num_fields; ++j )
 			{
+				shared_var_t* sv = new shared_var_t( fields[j], alarm_func );
 				// skip static fields
 				agent::instance()->jvmti()->GetFieldModifiers( cls, fields[j], &ret );
 				if (ret & JVM_ACC_STATIC)
-					continue;
-				//vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
-				vars_.push_back( new shared_var_t( fields[j], alarm_func ) );
+					static_vars::instance()->put_shared_var( sv );
+				else
+					//vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
+					vars_.push_back( sv );
 			}
 		}
 

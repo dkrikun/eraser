@@ -6,6 +6,7 @@
 #include "eraser/shared_vars_manage.h"
 #include "eraser/logger.h"
 #include "eraser/threads_manage.h"
+#include "eraser/static_vars.h"
 
 
 
@@ -80,13 +81,16 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
 			<< "\t" << "jthread name= " << thread_name << "\n"
 			;
 
+	shared_var_t* shared_var = 0;
 	if( object == 0 )	// static field
-		return;
+		shared_var = static_vars::instance()->get_shared_var( field );
+	else
+		shared_var = get_shared_var( object, field );
+	BOOST_ASSERT( shared_var != 0 );
 
 	thread_t* thread = get_thread( thread_id );
 	BOOST_ASSERT( thread != 0 );
-	shared_var_t* shared_var = get_shared_var( object, field );
-	BOOST_ASSERT( shared_var != 0 );
+
 //	debug_obj_data* x = get_tag<debug_obj_data>( object );
 //	BOOST_ASSERT( jni->IsSameObject( x->obj_, object ) == JNI_TRUE );
 //	shared_var_t* shared_var = x->shared_var_;
@@ -115,13 +119,15 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
 			<< "\t" << "jthread name= " << thread_name	<< "\n"
 			;
 
+	shared_var_t* shared_var = 0;
 	if( object == 0 )	// static field
-		return;
+		shared_var = static_vars::instance()->get_shared_var( field );
+	else
+		shared_var = get_shared_var( object, field );
+	BOOST_ASSERT( shared_var != 0 );
 
 	thread_t* thread = get_thread( thread_id );
 		BOOST_ASSERT( thread != 0 );
-		shared_var_t* shared_var = get_shared_var( object, field );
-		BOOST_ASSERT( shared_var != 0 );
 //		debug_obj_data* x = get_tag<debug_obj_data>( object );
 //		BOOST_ASSERT( jni->IsSameObject( x->obj_, object ) == JNI_TRUE );
 //		shared_var_t* shared_var = x->shared_var_;

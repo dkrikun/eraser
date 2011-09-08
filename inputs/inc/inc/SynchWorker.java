@@ -18,7 +18,7 @@ public class SynchWorker extends Worker
                         {
                                 cell.data ++;
                                 cell.id = id;
-          //                    Cell.sdata ++;
+                                Cell.sdata ++;
            //                   cell.subcell = sc;
                         }
                 }

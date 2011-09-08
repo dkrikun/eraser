@@ -73,9 +73,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         init_object_data( obj_gr, cls_gr, fields, field_count );
 
         // set up read/write access watches
-        // this also includes static variables (duplicated over all instances)
-        // this is not clever, and anyway we cannot fetch the object tag from within
-        // field access events, because there is no object!
+        // this also includes static variables
         for( size_t j=0; j<field_count; ++j )
         {
         	err = jvmti->SetFieldAccessWatch( cls, fields[j] );

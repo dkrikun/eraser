@@ -13,7 +13,7 @@ public class Cell
         {
                 id = new_id;
         }
-     // public static int sdata;
+        public static int sdata;
      // public SubCell subcell;
      // public SubCell subcell2;
 }
