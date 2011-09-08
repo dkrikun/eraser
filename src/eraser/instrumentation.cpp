@@ -121,7 +121,6 @@ void mnr( unsigned ccount, const char** method_names
                                  , jint* new_class_data_len, unsigned char** new_class_data )
         {
                 static size_t classfile_index;
-                bool is_thread = false;
 
                 // determine classname
                 const char* classname = get_classname( name, class_data, class_data_len );
@@ -136,7 +135,7 @@ void mnr( unsigned ccount, const char** method_names
                 		+ std::string("|java/lang/Object"));
                 xpr::cregex thread_filter = xpr::cregex::compile( eraser::agent::instance()->thread_filter_regex_ );
 
-                is_thread = xpr::regex_match( classname, thread_filter );
+                bool is_thread = xpr::regex_match( classname, thread_filter );
                 bool obj_match = xpr::regex_match( classname, filter );
                 if( !( is_thread || obj_match )  )
                 {
@@ -145,7 +144,10 @@ void mnr( unsigned ccount, const char** method_names
                 }
 
 
-                logger::instance()->level(5) << classname << std::boolalpha << " " << is_thread << std::endl;
+                logger::instance()->level(5) << classname
+                		<< std::boolalpha << " is_thread= " << is_thread
+                		<< " obj_match= " << obj_match
+                		<< std::endl;
 
                 // prevent self-instrumentation
                 if( strcmp(classname, PROXY_CLASS) == 0 )
@@ -164,7 +166,20 @@ void mnr( unsigned ccount, const char** method_names
                 bool is_system_class = ( agent::instance()->phase() < JVMTI_PHASE_START );
                 
                 // go instrument
-                if( is_thread )
+                if( obj_match )
+					java_crw_demo( classfile_index, classname
+								 , class_data, class_data_len
+								 , is_system_class
+								 , PROXY_CLASS
+								 , "L" PROXY_CLASS ";"
+								 , MONITOR_ENTER, "(Ljava/lang/Object;)V"
+								 , MONITOR_EXIT, "(Ljava/lang/Object;)V"
+								 , NEW_OBJ_METHOD, "(Ljava/lang/Object;)V"
+								 , NEW_ARR_METHOD, "(Ljava/lang/Object;)V"
+								 , &new_image
+								 , &new_length
+								 , 0, 0 );
+                else if( is_thread )
 					java_crw_demo( classfile_index, classname
 								 , class_data, class_data_len
 								 , is_system_class
@@ -178,18 +193,7 @@ void mnr( unsigned ccount, const char** method_names
 								 , &new_length
 								 , 0, 0 );
                 else
-					java_crw_demo( classfile_index, classname
-								 , class_data, class_data_len
-								 , is_system_class
-								 , PROXY_CLASS
-								 , "L" PROXY_CLASS ";"
-								 , 0, 0
-								 , 0, 0
-								 , NEW_OBJ_METHOD, "(Ljava/lang/Object;)V"
-								 , NEW_ARR_METHOD, "(Ljava/lang/Object;)V"
-								 , &new_image
-								 , &new_length
-								 , 0, 0 );
+                	BOOST_ASSERT( false );
                 
                 // memcpy transformed classfile to jvmti allocated memory
                 if( new_length > 0 )

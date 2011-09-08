@@ -22,4 +22,9 @@ Inc, 1 method synch worker. This guy has lots of locks taken - mistakenly none o
  Some wild crazy context switch on inspite of monitor enter/exit?
 
 
+Inc, 2 threads, 3 iter. Added synched method on Cell which writes to its field. Expected no alarms. But it DOES alarms. No monitor enter/exit
+observed in the output. Well, this is a bug, because synch. methods need to be instrumented not in thread classes but rather in classes who has their
+fields updated (in their own synch methods). Fixed.
+
+
 
