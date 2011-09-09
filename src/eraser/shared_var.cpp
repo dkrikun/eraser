@@ -147,7 +147,7 @@ namespace shared_var_fsm
                 void operator()(EVT const& e, FSM& fsm, SourceState& s ,TargetState& t )
                 {
                 	fsm.global_lock();
-                	eraser::logger::instance()->level(2) << "on " << typeid(EVT).name() << ": "
+                	eraser::logger::instance()->level(200) << "on " << typeid(EVT).name() << ": "
                         << typeid(SourceState).name() << " --> " << typeid(TargetState).name() << std::endl;
                 	fsm.global_unlock();
                 }

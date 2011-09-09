@@ -3,59 +3,72 @@ import java.io.*;
 
 public class Inc
 {
-	public static String readLine()
-	{
-		String s = "";
-		try {
-			InputStreamReader converter = new InputStreamReader(System.in);
-			BufferedReader in = new BufferedReader(converter);
-			s = in.readLine();
-		} catch (Exception e) {
-			System.out.println("Error! Exception: "+e); 
-		}
-		return s;
-	}
-        public static void main(String[] argv)
+        public static void main( String[] argv )
         {
-                if(argv.length < 3)
+                if( argv.length < 1 )
                 {
-                        System.err.println("<inc> num_threads num_iter worker_kind(0,1,2)");
+                        System.err.println( "expected scenario number" );
                         return;
                 }
-                int num_threads = Integer.parseInt(argv[0]);
-                int num_iter = Integer.parseInt(argv[1]);
-                int worker_kind = Integer.parseInt(argv[2]);
-                System.out.println("Hey there me monkey robot!");
 
-                //readLine();
+                switch( Integer.parseInt(argv[0]) )
+                {
+                        case 0: two_unsynched_workers(); break;
+                        case 1: two_synched_workers(); break;
+                        case 2: two_method_synched_workers(); break;
+                        case 3: two_synched_workers_and_main_thread_unsynched_but_initialization_issue_false_negative(); break;
+                        default: System.err.println( "no such scenario" ); return;
+                }
 
-                num_iter = 3 ;
+                try{ Thread.sleep(10000); } catch(java.lang.InterruptedException e) { System.out.println("INterrupted!!"); }
+        }
 
+        public static void two_unsynched_workers()
+        {
+                int num_iter = 10 ;
                 Cell cell = new Cell();
-            //  Cell cell2 = new Cell();
 
-           //   if( worker_kind == 0 )
-           //           for (int i = 0; i < num_threads; i++)
-           //                   new Worker(i,cell, num_iter).start();
-           //   else if( worker_kind == 1 )
-           //           for (int i = 0; i < num_threads; i++)
-           //                   new SynchWorker(i,cell, num_iter).start();
-           //   else
-           //           for (int i = 0; i < num_threads; i++)
-           //                   new MethodSynchWorker(i,cell, num_iter).start();
-                
-             // Worker w1 = new Worker( 0, cell, num_iter ); 
-             // Worker w2 = new Worker( 1, cell, num_iter ); 
-                Worker w3 = new SynchWorker( 2, cell, num_iter ); 
-                Worker w4 = new SynchWorker( 3, cell, num_iter ); 
-             // w1.start();
-             // w2.start();
-                w3.start();
-                w4.start();
+                Worker w1 = new Worker( 1, cell, num_iter ); 
+                Worker w2 = new Worker( 2, cell, num_iter ); 
+                w1.start();
+                w2.start();
+                System.out.println( "Expected lots of alarms" );
+        }
+        public static void two_synched_workers()
+        {
+                int num_iter = 5 ;
+                Cell cell = new Cell();
 
-                //System.out.println("Result: " + cell.data + " " + cell.id);
-               //System.out.println("Result: " + cell.data );
-                
-              try{ Thread.sleep(10000); }catch(java.lang.InterruptedException e) { System.out.println("INterrupted!!"); }
+                Worker w1 = new SynchWorker( 1, cell, num_iter ); 
+                Worker w2 = new SynchWorker( 2, cell, num_iter ); 
+                w1.start();
+                w2.start();
+                System.out.println( "Expected no alarms" );
+        }
+
+        public static void two_method_synched_workers()
+        {
+                int num_iter = 5 ;
+                Cell cell = new Cell();
+
+                Worker w1 = new MethodSynchWorker( 1, cell, num_iter ); 
+                Worker w2 = new MethodSynchWorker( 2, cell, num_iter ); 
+                w1.start();
+                w2.start();
+                System.out.println( "Expected no alarms" );
+        }
+
+        public static void two_synched_workers_and_main_thread_unsynched_but_initialization_issue_false_negative()
+        {
+                int num_iter = 5 ;
+                Cell cell = new Cell();
+
+                Worker w1 = new SynchWorker( 1, cell, num_iter ); 
+                Worker w2 = new SynchWorker( 2, cell, num_iter ); 
+                w1.start();
+                w2.start();
+
+                System.out.println("Result: " + cell.data + " " + cell.id);
+                System.out.println( "Expected no alarms" );
         }
 } 

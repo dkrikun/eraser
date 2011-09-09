@@ -37,7 +37,7 @@ void JNICALL vm_init( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread_id )
 	eraser::agent::instance()->jni_ = jni;
 
 	// emulate main thread start event
-	eraser::thread_start( jvmti, jni, thread_id );
+	//eraser::thread_start( jvmti, jni, thread_id );
 
 	// set up r/w watches for already loaded classes
 	eraser::logger::instance()->level(5) << "GOING TO SET UP WATCHES FOR LOADED CLASSES" << std::endl;

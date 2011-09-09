@@ -139,7 +139,7 @@ void agent::setup_field_watches( jclass cls ) const
 		return;
 
 	// filter out
-	logger::instance()->level(5) << INFO << class_sig( cls ) << std::endl;
+	logger::instance()->level(0) << INFO << class_sig( cls ) << std::endl;
 	xpr::sregex filter = xpr::sregex::compile( "L" + filter_regex_ + ";" );
 	if( !xpr::regex_match( class_sig( cls ), filter ) )
 		return;
