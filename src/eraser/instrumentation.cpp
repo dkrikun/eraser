@@ -95,7 +95,7 @@ void mnr( unsigned ccount, const char** method_names
                 jni->SetStaticIntField(klass, field, 0);
         }
 
-        // determine class name for instrumentation
+        // determine class name for the instrumentation
         inline const char* get_classname( const char* name, const unsigned char* class_data, jint class_data_len )
         {
                 const char* classname;
@@ -131,12 +131,16 @@ void mnr( unsigned ccount, const char** method_names
                 xpr::cregex filter = xpr::as_xpr("inc/") >> +xpr::alnum;
 #				endif
 
-                xpr::cregex filter = xpr::cregex::compile( eraser::agent::instance()->filter_regex_
-                		+ std::string("|java/lang/Object"));
+
+//                xpr::cregex filter = xpr::cregex::compile( eraser::agent::instance()->filter_regex_
+//                		+ std::string("|java/lang/Object"));
+
+
                 xpr::cregex thread_filter = xpr::cregex::compile( eraser::agent::instance()->thread_filter_regex_ );
 
                 bool is_thread = xpr::regex_match( classname, thread_filter );
-                bool obj_match = xpr::regex_match( classname, filter );
+                bool obj_match = strcmp(classname, "java/lang/Object") == 0;
+
                 if( !( is_thread || obj_match )  )
                 {
                 	free((void*)classname);
@@ -172,8 +176,8 @@ void mnr( unsigned ccount, const char** method_names
 								 , is_system_class
 								 , PROXY_CLASS
 								 , "L" PROXY_CLASS ";"
-								 , MONITOR_ENTER, "(Ljava/lang/Object;)V"
-								 , MONITOR_EXIT, "(Ljava/lang/Object;)V"
+								 , 0, 0
+								 , 0, 0
 								 , NEW_OBJ_METHOD, "(Ljava/lang/Object;)V"
 								 , NEW_ARR_METHOD, "(Ljava/lang/Object;)V"
 								 , &new_image

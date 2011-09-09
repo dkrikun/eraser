@@ -39,25 +39,22 @@ inline void alarm( jclass cls, jvmti_traits::field_id_t field_id, const thread_t
 
 struct object_data : boost::noncopyable
 {
-		typedef jvmti_traits::field_id_t                     fields_key_t;
-		//typedef std::map< fields_key_t, shared_var_t >		 map_t;
+		//typedef std::map< jfieldID, shared_var_t >		 map_t;
 		typedef std::vector<shared_var_t*>					 map_t;
 		map_t vars_;
 		jobject obj_;
 		std::string type_;
 
-		object_data( jobject obj
-				, jclass cls, fields_key_t* fields
-				, size_t num_fields
+		object_data( jobject obj, jclass cls, std::vector<jfieldID> fields
 				, shared_var_t::alarm_func_t alarm_func )
+
 				: obj_( obj )
 				, type_( "object_data" )
 		{
 			jint ret;
-			for( size_t j=0; j<num_fields; ++j )
+			for( size_t j=0; j<fields.size(); ++j )
 			{
 				shared_var_t* sv = new shared_var_t( fields[j], alarm_func );
-				// skip static fields
 				agent::instance()->jvmti()->GetFieldModifiers( cls, fields[j], &ret );
 				if (ret & JVM_ACC_STATIC)
 					static_vars::instance()->put_shared_var( sv );
@@ -67,7 +64,7 @@ struct object_data : boost::noncopyable
 			}
 		}
 
-		shared_var_t* get_shared_var( fields_key_t field )
+		shared_var_t* get_shared_var( jfieldID field )
 		{
 			for( size_t j=0; j<vars_.size(); ++j )
 				if( vars_[j]->field_id_	== field )
@@ -78,10 +75,10 @@ struct object_data : boost::noncopyable
 
 // sets up shared var logic for each field
 // object class is only needed for reporting in alarm function
-inline void init_object_data( jobject obj, jclass cls, jfieldID* field_ids, size_t num_fields )
+inline void init_object_data( jobject obj, jclass cls, std::vector<jfieldID> fields )
 {
 	shared_var_t::alarm_func_t f = boost::bind( &eraser::alarm, cls, _1, _2 );
-	tag_object( obj, new object_data( obj, cls, field_ids, num_fields, f ));
+	tag_object( obj, new object_data( obj, cls, fields, f ));
 }
 
 inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )

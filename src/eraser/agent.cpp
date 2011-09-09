@@ -1,13 +1,14 @@
 
 #include <jvmti.h>
 #include <vector>
+#include <boost/xpressive/xpressive.hpp>
 #include "eraser/assert_handler.h"
 #include "eraser/logger.h"
 #include "eraser/agent.h"
 #include "eraser/threads_manage.h"
 #include "sun/agent_util.h"
 
-
+namespace xpr = boost::xpressive;
 
 
 namespace eraser
@@ -102,6 +103,58 @@ void agent::reload_jni()
 		fatal_error( "ERROR: Unable to create JNIEnv, error=%d\n", res );
 	jni_ = env;
 }
+
+std::vector<jclass> agent::loaded_classes() const
+{
+	jvmtiError err;
+	jint num_classes = 0;
+	jclass* classes = 0;
+	err = jvmti()->GetLoadedClasses( &num_classes, &classes );
+	check_jvmti_error( jvmti(), err, "get loaded classes" );
+	return std::vector<jclass>( classes, classes+num_classes );
+}
+
+std::vector<jfieldID> agent::get_fields(jclass cls) const
+{
+	 jvmtiError err;
+	 jint field_count = 0;
+	 jfieldID* fields = 0;
+	 err = jvmti()->GetClassFields( cls, &field_count, &fields );
+	 check_jvmti_error( jvmti(), err, "get class fields" );
+	 // debug print
+	 for( size_t j=0; j<field_count; ++j )
+		 logger::instance()->level(1) << "\t\t" << j << " " << fields[j] << "\n";
+	 return std::vector<jfieldID>( fields, fields+field_count );
+}
+
+void agent::setup_field_watches( jclass cls ) const
+{
+	jvmtiError err;
+	jint cls_status = 0;
+	err = jvmti()->GetClassStatus( cls, &cls_status );
+	check_jvmti_error( jvmti(), err, "get class status" );
+
+	logger::instance()->level(0) << "cls_status= " << std::hex << cls_status << std::endl;
+	if( cls_status & JVMTI_CLASS_STATUS_ERROR )
+		return;
+
+	// filter out
+	logger::instance()->level(5) << INFO << class_sig( cls ) << std::endl;
+	xpr::sregex filter = xpr::sregex::compile( "L" + filter_regex_ + ";" );
+	if( !xpr::regex_match( class_sig( cls ), filter ) )
+		return;
+
+	std::vector<jfieldID> fields = get_fields( cls );
+
+	for( size_t j=0; j<fields.size(); ++j )
+	{
+		err = jvmti()->SetFieldAccessWatch( cls, fields[j] );
+		check_jvmti_error( jvmti(), err, "set field access watch" );
+		err = jvmti()->SetFieldModificationWatch( cls, fields[j] );
+		check_jvmti_error( jvmti(), err, "set field modification watch" );
+	}
+}
+
 
 
 }

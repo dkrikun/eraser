@@ -52,16 +52,6 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
 			<< "\n\t" << "class sig= " << cls_sig
 			<< std::endl;
 
-        // get fields declared within the class of the object being created
-        jint field_count = 0;
-        jfieldID* fields;
-        err = jvmti->GetClassFields( cls, &field_count, &fields );
-        check_jvmti_error(jvmti, err, "get class fields");
-
-        // debug print
-        for( size_t j=0; j<field_count; ++j )
-        	logger::instance()->level(1) << "\t\t" << j << " " << fields[j] << "\n";
-
         // set up eraser logic for each field
         jobject obj_gr = jni->NewGlobalRef( obj );
         if( obj_gr == 0 )
@@ -70,20 +60,9 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         if( cls_gr == 0 )
         	fatal_error( "Insufficient memory for new ref" );
 
-        init_object_data( obj_gr, cls_gr, fields, field_count );
+        std::vector<jfieldID> fields = agent::instance()->get_fields( cls );
+        init_object_data( obj_gr, cls_gr, fields );
 
-        // set up read/write access watches
-        // this also includes static variables
-        for( size_t j=0; j<field_count; ++j )
-        {
-        	err = jvmti->SetFieldAccessWatch( cls, fields[j] );
-    		// rude, probably better manage duplicates by ourselves
-        	if( err != JVMTI_ERROR_NONE && err != JVMTI_ERROR_DUPLICATE )
-        		check_jvmti_error(jvmti, err, "set field access watch");
-        	err = jvmti->SetFieldModificationWatch( cls, fields[j] );
-        	if( err != JVMTI_ERROR_NONE && err != JVMTI_ERROR_DUPLICATE )
-        		check_jvmti_error(jvmti, err, "set field modification watch");
-        }
 }
 
 void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)

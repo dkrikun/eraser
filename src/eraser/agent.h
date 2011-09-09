@@ -32,6 +32,9 @@ struct agent : boost::noncopyable
         std::string class_sig( jclass cls ) const;
         std::string thread_name( jthread thread ) const;
         void reload_jni();
+        std::vector<jclass> loaded_classes() const;
+        std::vector<jfieldID> get_fields(jclass cls) const;
+        void setup_field_watches(jclass) const;
 
         static agent* instance()
         {

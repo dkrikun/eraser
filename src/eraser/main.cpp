@@ -35,8 +35,18 @@ void JNICALL vm_init( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread_id )
 {
 	eraser::scoped_lock( jvmti, eraser::agent::instance()->monitor_ );
 	eraser::agent::instance()->jni_ = jni;
+
+	// emulate main thread start event
 	eraser::thread_start( jvmti, jni, thread_id );
 
+	// set up r/w watches for already loaded classes
+	eraser::logger::instance()->level(5) << "GOING TO SET UP WATCHES FOR LOADED CLASSES" << std::endl;
+	std::vector<jclass> loaded_classes = eraser::agent::instance()->loaded_classes();
+	for( std::vector<jclass>::iterator it = loaded_classes.begin(); it != loaded_classes.end(); ++ it )
+		eraser::agent::instance()->setup_field_watches(*it);
+	eraser::logger::instance()->level(5) << "FINISHED SETTING UP WATCHES FOR LOADED CLASSES" << std::endl;
+
+	// enable additional required event notifications
 	jvmtiError err;
 	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_VM_OBJECT_ALLOC );
 	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_VM_DEATH );
@@ -44,6 +54,8 @@ void JNICALL vm_init( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread_id )
 	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_FIELD_MODIFICATION );
 	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_THREAD_START );
 	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_THREAD_END );
+	//ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_CLASS_LOAD );
+	ENABLE_EVENT_NOTIFICATION( JVMTI_EVENT_CLASS_PREPARE );
 }
 
 
@@ -61,8 +73,24 @@ void JNICALL vm_classfile_load( jvmtiEnv *jvmti, JNIEnv* jni
 {
         LOCK_AND_EXIT_ON_DEATH();
         eraser::agent::instance()->jni_ = jni;
+
         eraser::instrument_classfile( jvmti, jni, class_being_redefined, loader, name, protection_domain
                                 , class_data_len, class_data, new_class_data_len, new_class_data );
+
+}
+
+void JNICALL vm_class_load( jvmtiEnv *jvmti, JNIEnv* jni, jthread thread, jclass cls )
+{
+	LOCK_AND_EXIT_ON_DEATH();
+	eraser::agent::instance()->jni_ = jni;
+	eraser::agent::instance()->setup_field_watches( cls );
+}
+
+void JNICALL vm_class_prepare( jvmtiEnv *jvmti, JNIEnv* jni, jthread thread, jclass cls )
+{
+	LOCK_AND_EXIT_ON_DEATH();
+	eraser::agent::instance()->jni_ = jni;
+	eraser::agent::instance()->setup_field_watches( cls );
 }
 
 void JNICALL vm_thread_start( jvmtiEnv *jvmti, JNIEnv *jni, jthread thread )
@@ -102,7 +130,8 @@ void JNICALL vm_field_write( jvmtiEnv* jvmti, JNIEnv* jni
         BOOST_ASSERT( jni != 0 );
         BOOST_ASSERT( field != 0 );
         eraser::agent::instance()->jni_ = jni;
-        eraser::field_write( jvmti, jni, thread, method, location, field_klass, object, field, signature_type, new_value );
+        eraser::field_write( jvmti, jni, thread, method, location
+        		, field_klass, object, field, signature_type, new_value );
 }
 
 void JNICALL vm_death( jvmtiEnv *jvmti, JNIEnv *jni )
@@ -117,8 +146,8 @@ void JNICALL vm_death( jvmtiEnv *jvmti, JNIEnv *jni )
         jvmtiError err;
         jvmtiEventCallbacks callbacks;
         memset(&callbacks, 0, sizeof(callbacks));
-        err = jvmti->SetEventCallbacks(&callbacks, (jint)sizeof(callbacks));
-        check_jvmti_error(jvmti, err, "Cannot set jvmti callbacks");
+        err = jvmti->SetEventCallbacks( &callbacks, (jint)sizeof(callbacks) );
+        check_jvmti_error( jvmti, err, "Cannot set jvmti callbacks" );
 }
 
 
@@ -130,21 +159,16 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         jint rc;
         jvmtiError err;
         
+        // init jvm env.
         eraser::agent::instance()->jvm_ = vm;
 
-        // init jvmti env
+        // init jvmti env.
         jvmtiEnv* jvmti = 0;
         rc = vm->GetEnv( (void **)&jvmti, JVMTI_VERSION );
         if (rc != JNI_OK || jvmti == 0)
             fatal_error("ERROR: Unable to create jvmtiEnv, error=%d\n", rc);
         eraser::agent::instance()->jvmti_ = jvmti;
 
-        // init jni env
-//        JNIEnv* jni = 0;
-//        rc = vm->GetEnv( (void**)&jni, JNI_VERSION_1_2 );
-//        if (rc != JNI_OK || jni == 0)
-//             fatal_error("ERROR: Unable to create JNIEnv, error=%d\n", rc);
-//        eraser::agent::instance()->jni_ = jni;
 
 #		if 0
         char* log_level_envar = std::getenv("ERASER_LOG_LEVEL");
@@ -155,7 +179,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
 #		endif
 
 
-        // init agent lock
+        // init agent global mutex
         err = jvmti->CreateRawMonitor("agent lock", &(eraser::agent::instance()->monitor_));
         check_jvmti_error(jvmti, err, "create raw monitor");
 
@@ -174,6 +198,8 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
 				("thread-filter", po::value<std::string>()->default_value("inc\\.Worker"
 						"|inc\\.SynchWorker"
 						"|inc\\.MethodSynchWorker"
+						"|inc\\.Cell"
+						"|inc\\.CellInherit"
 						)
 						, "regex to match thread classes")
 #				else
@@ -243,6 +269,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved)
         callbacks.FieldModification       = &vm_field_write;
         callbacks.ThreadStart             = &vm_thread_start;
         callbacks.ThreadEnd               = &vm_thread_end;
+        callbacks.ClassPrepare			  = &vm_class_prepare;
         err = jvmti->SetEventCallbacks(&callbacks, sizeof(callbacks));
         check_jvmti_error(jvmti, err, "set event callbacks");
         
