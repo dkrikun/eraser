@@ -22,9 +22,6 @@ namespace eraser
 {
 namespace shared_var_fsm
 {
-    #define xxstr(x) #x
-    #define xstr(x) xxstr(x)
-
     // events
     template <class EraserTraits>
     struct write
@@ -102,19 +99,25 @@ namespace shared_var_fsm
                 }
         };
 
+
+#		define PRINT_CV_AND_LOCKS_HELD(log_level)\
+		do{																			\
+		fsm.global_lock();															\
+        eraser::logger::instance()->level(1) << "CV: " << fsm.cv_ << std::endl;		\
+        eraser::logger::instance()->level(1) << "locks_held by thread "				\
+        		<< e.accessing_thread_ << ": "										\
+        		<< e.accessing_thread_.locks_held_									\
+        		<< std::endl;														\
+        fsm.global_unlock();														\
+		}while(0)
+
         struct shared_read : public msm::front::state<>
         {
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
+            			PRINT_CV_AND_LOCKS_HELD(1);
                         // update cv
-						fsm.global_lock();
-						eraser::logger::instance()->level(1) << "CV: " << fsm.cv_ << std::endl;
-						eraser::logger::instance()->level(1) << "locks_held by thread "
-								<< e.accessing_thread_ << ": "
-								<< e.accessing_thread_.locks_held_
-								<< std::endl;
-						fsm.global_unlock();
                         fsm.update_cv( e.accessing_thread_.locks_held_ );
                 }
         };
@@ -124,19 +127,14 @@ namespace shared_var_fsm
                 template <class Event,class FSM>
                 void on_entry(Event const& e, FSM& fsm)
                 {
-                		fsm.global_lock();
-                		eraser::logger::instance()->level(1) << "CV: " << fsm.cv_ << std::endl;
-                		eraser::logger::instance()->level(1) << "locks_held by thread "
-                				<< e.accessing_thread_ << ": "
-                				<< e.accessing_thread_.locks_held_
-                				<< std::endl;
-                		fsm.global_unlock();
+                		PRINT_CV_AND_LOCKS_HELD(1);
                         // update cv & check data races
                         fsm.update_cv( e.accessing_thread_.locks_held_ );
                         if( fsm.cv_empty() && fsm.alarm_ )
                                 fsm.alarm_( e.accessing_thread_ );
                 }
         };
+#		undef PRINT_CV_AND_LOCKS_HELD
 
         typedef virgin initial_state;
 
@@ -167,13 +165,7 @@ namespace shared_var_fsm
                 {
                     BOOST_ASSERT_MSG( from.last_accessing_thread_
                     		, "last_accessing_thread_ is supposed to be init. at this point!" );
-                    bool res = evt.accessing_thread_ != from.last_accessing_thread_.get();
-#                   if 0 //defined( ERASER_DEBUG )
-                    std::cout << "accessing thread= " << evt.accessing_thread_ << std::endl;
-                    std::cout << "last acc. thread= " << from.last_accessing_thread_.get() << std::endl;
-                    std::cout << "guard condition= " << std::boolalpha << res << std::endl;
-#                   endif
-                    return res;
+                    return evt.accessing_thread_ != from.last_accessing_thread_.get();
                 }
         };
  
@@ -204,11 +196,7 @@ namespace shared_var_fsm
         template <class FSM,class Event>
         void no_transition(Event const& e, FSM& fsm,int state)
         {
-        	fsm.global_lock();
-        	eraser::logger::instance()->level(2) << "NO TRANS on "
-        			<< typeid(Event).name() << " from " << state << std::endl;
             BOOST_ASSERT_MSG(false, "No transition in fsm");
-            fsm.global_unlock();
         }
     };
 

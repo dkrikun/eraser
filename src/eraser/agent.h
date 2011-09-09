@@ -6,10 +6,8 @@
 #include <execinfo.h>
 #include <jvmti.h>
 #include <boost/utility.hpp>
-#include "eraser/assert_handler.h"
-#if defined( ERASER_DEBUG )
 #include <vector>
-#endif
+#include "eraser/assert_handler.h"
 
 
 # define LOCK_AND_EXIT_ON_DEATH()\
@@ -68,7 +66,6 @@ struct agent : boost::noncopyable
         JavaVM*				     jvm_;
         jrawMonitorID            monitor_;
         bool                     death_active_;
-        bool					 met_destroy_jvm_thread_;
         std::string 			 filter_regex_;
         std::string 			 thread_filter_regex_;
 
@@ -78,7 +75,6 @@ struct agent : boost::noncopyable
                 : jvmti_(0)
 				, jni_(0)
         		, jvm_(0)
-        		, met_destroy_jvm_thread_( false )
         {}
 };
 

@@ -19,12 +19,10 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 {
 		agent::instance()->jvmti_ = jvmti;
 		agent::instance()->jni_ = jni;
-		// workaround, no new threads after 'DestroyJavaVM' are allowed
 		std::string thread_name = agent::instance()->thread_name( thread_id );
-		if( ( thread_name == "DestroyJavaVM") || agent::instance()->met_destroy_jvm_thread_ )
+		if( thread_name == "DestroyJavaVM" )
 		{
 			logger::instance()->level(5) << "met DestroyJavaVM thread, aborting" << std::endl;
-			agent::instance()->met_destroy_jvm_thread_ = true;
 			agent::instance()->death_active_ = true;
 			return;
 		}
@@ -62,7 +60,6 @@ void thread_end( jvmtiEnv *jvmti, JNIEnv *jni
 				<< "thread_t= " << thread << " " << *thread
 				<< std::endl;
 
-		//jni->DeleteGlobalRef( thread_id );
 		clear_tag( thread_id );
 }
 
@@ -90,11 +87,6 @@ void field_read( jvmtiEnv* jvmti, JNIEnv* jni
 
 	thread_t* thread = get_thread( thread_id );
 	BOOST_ASSERT( thread != 0 );
-
-//	debug_obj_data* x = get_tag<debug_obj_data>( object );
-//	BOOST_ASSERT( jni->IsSameObject( x->obj_, object ) == JNI_TRUE );
-//	shared_var_t* shared_var = x->shared_var_;
-//	BOOST_ASSERT( shared_var != 0 );
 
 	logger::instance()->level(1)
 						<< "\t" << "thread_t= " << thread << " " << *thread
@@ -127,11 +119,8 @@ void field_write( jvmtiEnv* jvmti, JNIEnv* jni
 	BOOST_ASSERT( shared_var != 0 );
 
 	thread_t* thread = get_thread( thread_id );
-		BOOST_ASSERT( thread != 0 );
-//		debug_obj_data* x = get_tag<debug_obj_data>( object );
-//		BOOST_ASSERT( jni->IsSameObject( x->obj_, object ) == JNI_TRUE );
-//		shared_var_t* shared_var = x->shared_var_;
-//		BOOST_ASSERT( shared_var != 0 );
+	BOOST_ASSERT( thread != 0 );
+
 
 	logger::instance()->level(1)
 					<< "\t" << "thread_t= " << thread << " " << *thread

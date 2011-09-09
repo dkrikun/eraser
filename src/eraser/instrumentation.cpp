@@ -125,20 +125,11 @@ void mnr( unsigned ccount, const char** method_names
                 // determine classname
                 const char* classname = get_classname( name, class_data, class_data_len );
 
-#				if 0
-                // debugging, filter out all classes except for package "inc"
-                // nested packages are also filtered out here
-                xpr::cregex filter = xpr::as_xpr("inc/") >> +xpr::alnum;
-#				endif
-
-
-//                xpr::cregex filter = xpr::cregex::compile( eraser::agent::instance()->filter_regex_
-//                		+ std::string("|java/lang/Object"));
-
-
-                xpr::cregex thread_filter = xpr::cregex::compile( eraser::agent::instance()->thread_filter_regex_ );
-
-                bool is_thread = xpr::regex_match( classname, thread_filter );
+                std::string internal_classname("L");
+                internal_classname += classname;
+                internal_classname += ";";
+                xpr::sregex thread_filter = xpr::sregex::compile( eraser::agent::instance()->thread_filter_regex_ );
+                bool is_thread = xpr::regex_match( internal_classname, thread_filter );
                 bool obj_match = strcmp(classname, "java/lang/Object") == 0;
 
                 if( !( is_thread || obj_match )  )
@@ -148,7 +139,7 @@ void mnr( unsigned ccount, const char** method_names
                 }
 
 
-                logger::instance()->level(5) << classname
+                logger::instance()->level(500) << classname
                 		<< std::boolalpha << " is_thread= " << is_thread
                 		<< " obj_match= " << obj_match
                 		<< std::endl;

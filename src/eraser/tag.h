@@ -9,7 +9,7 @@
 namespace eraser
 {
 
-// Facilitate arbitrate date attachment to jobject
+// faciliate arbitrate date attachment to jobject
 template<class Data>
 void tag_object( jobject obj, Data* data )
 {

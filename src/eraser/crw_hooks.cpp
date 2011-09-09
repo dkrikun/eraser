@@ -27,10 +27,8 @@ namespace eraser
 void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobject obj )
 {
 		LOCK_AND_EXIT_ON_DEATH();
-        jvmtiError err;
-        jvmtiEnv* jvmti = agent::instance()->jvmti();
         BOOST_ASSERT( jni != 0 );
-		agent::instance()->jni_ = jni;
+
         if( agent::instance()->phase() != JVMTI_PHASE_LIVE )
                 return;
 
@@ -38,12 +36,13 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         std::string cls_sig = agent::instance()->class_sig( cls );
         std::string thread_name = agent::instance()->thread_name( thread_id );
 
+
         // filter out
-        xpr::sregex filter = xpr::sregex::compile( "L" + eraser::agent::instance()->filter_regex_ + ";" );
+        xpr::sregex filter = xpr::sregex::compile( agent::instance()->filter_regex_ );
         if( !xpr::regex_match( cls_sig, filter ) )
         	return;
 
-        // some debug print
+#		if defined( ERASER_DEBUG )
 		std::string name = agent::instance()->thread_name( thread_id );
         thread_t* thread = get_thread( thread_id );
         logger::instance()->level(1) << "NEW OBJ"
@@ -51,6 +50,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
 			<< "\n\t" << "thread_t= " << thread << " " << *thread
 			<< "\n\t" << "class sig= " << cls_sig
 			<< std::endl;
+#		endif
 
         // set up eraser logic for each field
         jobject obj_gr = jni->NewGlobalRef( obj );
@@ -104,13 +104,6 @@ void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject o
 				<< "\n\t" << "thread_t= " << thread << " " << *thread
 				<< "\n\t" << "monitor local= " << obj
 				<< std::endl;
-
-#		if 0
-		// do we really need a global reference here?
-		jobject global_ref = jni->NewGlobalRef( obj );
-        if( global_ref == 0 )
-        			fatal_error("Out of memory while trying to create new global ref.");
-#		endif
 		thread->unlock( lock(obj) );
 }
 

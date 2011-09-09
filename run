@@ -12,6 +12,6 @@ rm -f dump out *.log backtrace stdout
 ( cd inputs/inc/inc ; $java_prefix/bin/javac *.java )
 ( cd inputs/inc ; $java_prefix/bin/javac *.java)
 
-( $java_prefix/bin/java -Xcheck:jni -Xloggc:gc.log -verbose:jni -agentpath:./bin/liberaser.so=--log-level=200 -Xbootclasspath/a:./bin -cp $classpath $class $args > stdout )>& out
+( $java_prefix/bin/java -Xcheck:jni -Xloggc:gc.log -verbose:jni -agentpath:./bin/liberaser.so=--log-level=$2 -Xbootclasspath/a:./bin -cp $classpath $class $args > stdout )>& out
 #gdb --args java -agentpath:./bin/liberaser.so=--log-level=1 -Xbootclasspath/a:./bin -cp $classpath $class $args
 #$java_prefix/bin/jdb  -J-agentpath:./bin/agent.so -J-Xbootclasspath/a:./bin -classpath $classpath $class $args

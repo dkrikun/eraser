@@ -39,17 +39,14 @@ inline void alarm( jclass cls, jvmti_traits::field_id_t field_id, const thread_t
 
 struct object_data : boost::noncopyable
 {
-		//typedef std::map< jfieldID, shared_var_t >		 map_t;
 		typedef std::vector<shared_var_t*>					 map_t;
 		map_t vars_;
 		jobject obj_;
-		std::string type_;
 
 		object_data( jobject obj, jclass cls, std::vector<jfieldID> fields
 				, shared_var_t::alarm_func_t alarm_func )
 
 				: obj_( obj )
-				, type_( "object_data" )
 		{
 			jint ret;
 			for( size_t j=0; j<fields.size(); ++j )
@@ -59,7 +56,6 @@ struct object_data : boost::noncopyable
 				if (ret & JVM_ACC_STATIC)
 					static_vars::instance()->put_shared_var( sv );
 				else
-					//vars_.insert( std::make_pair( fields[j], shared_var_t( fields[j], alarm_func ) ));
 					vars_.push_back( sv );
 			}
 		}
@@ -85,11 +81,11 @@ inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 {
 	object_data* od = get_tag<object_data>(field_object);
 	BOOST_ASSERT( od != 0 );
-	logger::instance()->level(0) << "OBJ TYPE=" << od->type_ << std::endl;
 	JNIEnv* jni = agent::instance()->jni();
 	BOOST_ASSERT( jni->IsSameObject( field_object, od->obj_) == JNI_TRUE );
 	shared_var_t* res =  od->get_shared_var( field_id );
-	BOOST_ASSERT_MSG( res, "FAILED search in shared_vars" );
+	if( res == 0 )
+		fatal_error( "failed search in object data shared vars");
 	return res;
 }
 

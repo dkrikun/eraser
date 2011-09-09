@@ -22,7 +22,6 @@ namespace eraser
                 thread( thread_id_t thread_id, std::string name )
                         : thread_id_(thread_id)
                 		, name_(name)
-                	    , type_("thread")
                 {}
 
                 // using default copy-ctor & assignment
@@ -30,7 +29,6 @@ namespace eraser
                 thread_id_t                thread_id_;
                 std::string				   name_;
                 thread_set< lock_id_t >    locks_held_;
-                std::string				   type_;
 
                 void lock( lock_id_t lock )
                 {
