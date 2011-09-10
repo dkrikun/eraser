@@ -82,7 +82,7 @@ inline shared_var_t* get_shared_var( jobject field_object, jfieldID field_id )
 	object_data* od = get_tag<object_data>(field_object);
 	BOOST_ASSERT( od != 0 );
 	JNIEnv* jni = agent::instance()->jni();
-	BOOST_ASSERT( jni->IsSameObject( field_object, od->obj_) == JNI_TRUE );
+	BOOST_ASSERT( agent::instance()->jni()->IsSameObject( field_object, od->obj_) == JNI_TRUE );
 	shared_var_t* res =  od->get_shared_var( field_id );
 	if( res == 0 )
 		fatal_error( "failed search in object data shared vars");
