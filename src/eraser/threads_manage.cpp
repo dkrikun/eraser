@@ -14,10 +14,7 @@ thread_t* get_thread( jthread thread_id )
 {
 	thread_t* thread = get_tag<thread_t>( thread_id );
 	if( thread != 0 )
-	{
-		logger::instance()->level(0) << "THREAD TYPE=" << thread->type_ << std::endl;
 		BOOST_ASSERT( agent::instance()->jni()->IsSameObject( thread_id, thread->thread_id_ ) == JNI_TRUE );
-	}
 	return thread;
 }
 

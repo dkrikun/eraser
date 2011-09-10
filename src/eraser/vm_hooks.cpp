@@ -27,7 +27,7 @@ void thread_start( jvmtiEnv *jvmti, JNIEnv *jni
 			return;
 		}
 
-		jthread global_ref = jni->NewGlobalRef( thread_id );
+		jthread global_ref = agent::instance()->jni()->NewGlobalRef( thread_id );
 		if( global_ref == 0 )
 			fatal_error("Out of memory while trying to create new global ref.");
 

@@ -139,7 +139,7 @@ void mnr( unsigned ccount, const char** method_names
                 }
 
 
-                logger::instance()->level(500) << classname
+                logger::instance()->level(100) << classname
                 		<< std::boolalpha << " is_thread= " << is_thread
                 		<< " obj_match= " << obj_match
                 		<< std::endl;
