@@ -32,7 +32,7 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
         if( agent::instance()->phase() != JVMTI_PHASE_LIVE )
                 return;
 
-        jclass cls = jni->GetObjectClass(obj);
+        jclass cls = agent::instance()->jni()->GetObjectClass(obj);
         std::string cls_sig = agent::instance()->class_sig( cls );
         std::string thread_name = agent::instance()->thread_name( thread_id );
 
@@ -53,10 +53,10 @@ void native_newobj( JNIEnv *jni, jclass tracker_class, jthread thread_id, jobjec
 #		endif
 
         // set up eraser logic for each field
-        jobject obj_gr = jni->NewGlobalRef( obj );
+        jobject obj_gr = agent::instance()->jni()->NewGlobalRef( obj );
         if( obj_gr == 0 )
         	fatal_error( "Insufficient memory for new ref" );
-        jclass cls_gr = (jclass)jni->NewGlobalRef( cls );
+        jclass cls_gr = (jclass)agent::instance()->jni()->NewGlobalRef( cls );
         if( cls_gr == 0 )
         	fatal_error( "Insufficient memory for new ref" );
 
@@ -77,7 +77,7 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
         thread_t* thread = get_thread( thread_id );
         if( thread == 0 )
         	return;
-        jobject global_ref = jni->NewGlobalRef( obj );
+        jobject global_ref = agent::instance()->jni()->NewGlobalRef( obj );
         if( global_ref == 0 )
         		fatal_error("Out of memory while trying to create new global ref.");
 

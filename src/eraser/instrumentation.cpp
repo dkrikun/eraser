@@ -61,19 +61,19 @@ void mnr( unsigned ccount, const char** method_names
                     { NATIVE_MONITOR_EXIT,    "(Ljava/lang/Object;Ljava/lang/Object;)V", (void*)native_monitor_exit }
                 };
                 
-                jclass klass = jni->FindClass(PROXY_CLASS);
+                jclass klass = agent::instance()->jni()->FindClass(PROXY_CLASS);
                 if( klass == 0 )
                     fatal_error("ERROR: JNI: Cannot find %s with FindClass\n", PROXY_CLASS);
 
-                rc = jni->RegisterNatives(klass, registry, 4);
+                rc = agent::instance()->jni()->RegisterNatives(klass, registry, 4);
                 if( rc != 0 )
                     fatal_error("ERROR: JNI: Cannot register natives for class %s\n", PROXY_CLASS);
 
-                jfieldID field = jni->GetStaticFieldID(klass, ENGAGED_FIELD, "I");
+                jfieldID field = agent::instance()->jni()->GetStaticFieldID(klass, ENGAGED_FIELD, "I");
                 if( field == 0 )
                     fatal_error("ERROR: JNI: Cannot get field from %s\n", PROXY_CLASS);
                     
-                jni->SetStaticIntField(klass, field, 1);       
+                agent::instance()->jni()->SetStaticIntField(klass, field, 1);       
 
         }
 
@@ -84,15 +84,15 @@ void mnr( unsigned ccount, const char** method_names
          */
         void disengage( jvmtiEnv* jvmti, JNIEnv* jni )
         {
-                jclass klass = jni->FindClass(PROXY_CLASS);
+                jclass klass = agent::instance()->jni()->FindClass(PROXY_CLASS);
                 if( klass == 0 )
                     fatal_error("ERROR: JNI: Cannot find %s with FindClass\n", PROXY_CLASS);
 
-                jfieldID field = jni->GetStaticFieldID(klass, ENGAGED_FIELD, "I");
+                jfieldID field = agent::instance()->jni()->GetStaticFieldID(klass, ENGAGED_FIELD, "I");
                 if( field == 0 )
                     fatal_error("ERROR: JNI: Cannot get field from %s\n", PROXY_CLASS);
          
-                jni->SetStaticIntField(klass, field, 0);
+                agent::instance()->jni()->SetStaticIntField(klass, field, 0);
         }
 
         // determine class name for the instrumentation
@@ -139,7 +139,7 @@ void mnr( unsigned ccount, const char** method_names
                 }
 
 
-                logger::instance()->level(500) << classname
+                logger::instance()->level(200) << classname
                 		<< std::boolalpha << " is_thread= " << is_thread
                 		<< " obj_match= " << obj_match
                 		<< std::endl;
