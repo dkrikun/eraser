@@ -18,8 +18,7 @@ namespace eraser
 	inline void backtrace()  __attribute((always_inline));
 	inline void backtrace()
 	{
-		//int bt_fd = ::open( "backtrace", O_RDWR|O_CREAT );
-		int bt_fd = 1;
+		int bt_fd = ::open( "backtrace", O_RDWR|O_CREAT );
 		const int max_size = 15;
 		static void* stack_buffer[max_size];
 
