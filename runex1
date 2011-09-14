@@ -9,7 +9,12 @@ class=ex1.Ex1
 args="inputs/ex1/samples/ak47.lif 8 8 100 200 200"
 rm -f dump out *.log backtrace stdout
 
-$java_prefix/bin/java -Xcheck:jni -Xprof -agentpath:./bin/liberaser.so=--log-level=$1,--obj-filter='Lex1/Cell',--thread-filter='Lex1/\\w+;' -Xbootclasspath/a:./bin -cp $classpath $class $args > out
+pushd $eraser/inputs/ex1
+$java_prefix/bin/javac *.java
+mv *.class ex1
+popd
+
+$java_prefix/bin/java -Xcheck:jni -agentpath:./bin/liberaser.so=--log-level=$1,--obj-filter='Lex1/Cell',--thread-filter='Lex1/\\w+;' -Xbootclasspath/a:./bin -cp $classpath $class $args > out
 
 #gdb --args java -agentpath:./bin/liberaser.so=--log-level=1 -Xbootclasspath/a:./bin -cp $classpath $class $args
 #$java_prefix/bin/jdb  -J-agentpath:./bin/agent.so -J-Xbootclasspath/a:./bin -classpath $classpath $class $args

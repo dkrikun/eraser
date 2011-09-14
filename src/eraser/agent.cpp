@@ -102,9 +102,6 @@ void agent::reload_jni()
     else if( res != JNI_OK || env == 0 )
 		fatal_error( "ERROR: Unable to create JNIEnv, error=%d\n", res );
 	jni_ = env;
-	jint ver = jni_->GetVersion();
-	//logger::instance()->level(5000) << ver << std::endl;
-	eraser::backtrace();
 }
 
 std::vector<jclass> agent::loaded_classes() const

@@ -72,6 +72,7 @@ void native_newarr(JNIEnv *jni, jclass klass, jthread thread, jobject obj)
 void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
 		LOCK_AND_EXIT_ON_DEATH();
+		agent::instance()->jni_ = jni;
 		std::string name = agent::instance()->thread_name( thread_id );
         thread_t* thread = get_thread( thread_id );
         if( thread == 0 )
@@ -92,6 +93,7 @@ void native_monitor_enter(JNIEnv *jni, jclass klass, jthread thread_id, jobject 
 void native_monitor_exit(JNIEnv *jni, jclass klass, jthread thread_id, jobject obj)
 {
 		LOCK_AND_EXIT_ON_DEATH();
+		agent::instance()->jni_ = jni;
 		std::string name = agent::instance()->thread_name( thread_id );
 		thread_t* thread = get_thread( thread_id );
         if( thread == 0 )
