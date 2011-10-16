@@ -44,6 +44,9 @@
  *
  */
 
+// This is not exactly the original java_crw_demo.c, we've modified it to instument monitorenter/exit instructions
+// and synchronized methods enter/exit.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

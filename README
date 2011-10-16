@@ -1,10 +1,28 @@
 
-Using:
-        boost 1.46.1
-        java-6-sun-1.6.0.21
-        Ubuntu 10.10
-        g++ (Ubuntu/Linaro 4.4.4-14ubuntu5) 4.4.5
-        Boost.Jam 03.1.19
-        gmock-1.6.0
+Dependencies:
+================
+        boost-1.46.1
+        , in particular:
+                header-only: xpressive utility optional operator msm bind function shared_ptr
+                library: program_options
 
-Build files are really dirty, config for yourself, no time to set this up properly.
+        java-6-sun-1.6.0.21 (JDK)
+        gmock-1.6.0 (for unit-testing only)
+        g++ (Ubuntu/Linaro 4.4.4-14ubuntu5) 4.4.5
+        Ubuntu 10.10
+
+Building:
+================
+You have 2 ways to do it: either with Boost.Bjam or CMake.
+
+With Boost.Bjam you have Jamroot in the project root directory. Edit it (pay attention, some of the build file lines are dedicated solely to unit-testing so you may remove them in case any problem arises with test building), then run 'bjam' to build the library and the unit tests.
+
+With CMake again edit the CMakeLists.txt to suit your system, then run 'cmake -G "Unix Makefiles" && make'. Use 'make VERBOSE=1' in case you need more diagnostics for the build process.
+
+Then, if you need to rebuild the Proxy class (e.g. if you'd modified it), run 'javac src/eraser/Proxy.java -d bin'.
+
+Input files are in the 'inputs' subdirectory.
+
+To run the agent append 'agentpath:./bin/liberaser.so'.
+
+Attached are some scripts ('run','runmany' & 'runex1') that we have used throughout the development process to rebuild the library, input java class files and run jvm with approriate parameters. You'll probably would like to edit these scripts and use them.
