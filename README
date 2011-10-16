@@ -23,6 +23,22 @@ Then, if you need to rebuild the Proxy class (e.g. if you'd modified it), run 'j
 
 Input files are in the 'inputs' subdirectory.
 
-To run the agent append 'agentpath:./bin/liberaser.so'.
+Running the agent (example):
+        java -agentpath:./bin/liberaser.so=--log-level=100 -Xbootclasspath/a:./bin -cp inputs/inc Inc 0
+Explanation: 
+        -agentpath:./bin/liberaser.so                   - path to the agent SO library
+        =--log-level=100                                - argument log-level to the agent itself (explained below) 
+        -Xbootclasspath/a:./bin                         - where to look for Proxy.class
+        -cp inputs/inc Inc                              - classpath & class of the input
+        0                                               - argument to the input class
 
+        The agent accepts few options defined in 'src/eraser/main.cpp:159' and later on. Following options are available:
+        --log-level                                     - used to filter debug messages, greater values mean less debug messages, use some 200000 to hide all debug messages.
+        --obj-filter & --thread-filter                  - these are regexes that allow to filter out classes that you do not want to be instrumented (or have there fields monitored with read/write watches respectively). Syntax may be borthersome, because you might need to escape certain characters. Boost.Xpressive is used to parse the regexes, in case you're already familiar with it.
+
+        The agent options all have default values, and in case you have ERASER_DEBUG defined, the defaults are defined to suit the 'inc' input sample.
+        
 Attached are some scripts ('run','runmany' & 'runex1') that we have used throughout the development process to rebuild the library, input java class files and run jvm with approriate parameters. You'll probably would like to edit these scripts and use them.
+
+'run' rebuilds the agent library and input files if required and then runs the agent on 'inc' sample classes. The script takes 2 parameters: scenario to chose (see inputs/inc/Inc.java) and the log-level as described above, for example './run 1 100'.
+Other scripts are similar, used for convenience to debug.
